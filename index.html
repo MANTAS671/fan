@@ -1,177 +1,206 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
 <title>Baby Bump Defender</title>
+<meta name="description" content="Игра для будущей мамы: собирай хорошие вибрации (❤️), избегай стресса (💣), дари малышу счастье.">
 <style>
   :root {
     --bg:#0f111a;
     --card:#1f2135;
-    --radius:16px;
-    --shadow:0 20px 40px -10px rgba(0,0,0,0.5);
-    --accent:#ff6b6b;
-    --muted:#888bb3;
+    --radius:14px;
+    --accent1:#ff6b6b;
+    --accent2:#ff9f43;
+    --text:#e3e8ff;
+    --muted:#8f97b3;
+    --shadow:0 25px 60px -10px rgba(0,0,0,0.45);
+    --transition:.18s cubic-bezier(.22,.61,.36,1);
     font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   }
   *{box-sizing:border-box;}
-  body{
+  body {
     margin:0;
-    background: linear-gradient(135deg,#0f111a 0%,#1f2135 80%);
     min-height:100vh;
-    color:#e3e8ff;
+    background: linear-gradient(135deg,#0f111a 0%,#1f2135 90%);
+    color: var(--text);
     -webkit-font-smoothing:antialiased;
+    line-height:1.2;
+    display:flex;
+    justify-content:center;
+    padding:12px 8px;
   }
-  .container{
-    max-width:900px;
-    margin:0 auto;
-    padding:12px 16px 40px;
+  .app {
+    width:100%;
+    max-width:500px;
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:10px;
+    position:relative;
   }
-  header{
+  header {
     display:flex;
     flex-wrap:wrap;
-    align-items:center;
-    gap:10px;
     justify-content:space-between;
+    gap:8px;
+    align-items:flex-start;
   }
-  h1{
+  h1 {
     margin:0;
-    font-size:1.6rem;
+    font-size:1.5rem;
     display:flex;
     align-items:center;
     gap:8px;
   }
-  .name-input{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-    align-items:center;
-    font-size:0.9rem;
+  .small {
+    font-size:0.65rem;
+    color: var(--muted);
+    margin-top:2px;
   }
-  .name-input input{
-    padding:8px 12px;
+  .name-section {
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    align-items:center;
+    font-size:0.8rem;
+  }
+  .name-section label {
+    flex-shrink:0;
+  }
+  .name-section input {
+    padding:8px 14px;
     border-radius:999px;
     border:none;
     outline:none;
-    font-size:1rem;
-    min-width:140px;
-    background:#1f2135;
+    font-size:0.9rem;
+    background: rgba(255,255,255,0.06);
     color:#fff;
-    box-shadow:inset 0 0 10px rgba(255,255,255,0.03);
+    min-width:130px;
+    flex:1;
   }
-  #game-area{
+  #game-area {
     position:relative;
-    background:rgba(255,255,255,0.03);
+    background:rgba(255,255,255,0.02);
     border-radius:16px;
     overflow:hidden;
     display:flex;
     flex-direction:column;
     gap:8px;
-    padding:12px;
+    padding:12px 12px 6px;
   }
-  canvas{
+  canvas {
     width:100%;
     aspect-ratio:9/16;
-    background:linear-gradient(135deg,#1f233c 0%,#0f111a 90%);
+    background: linear-gradient(135deg,#1f233c,#0f111a);
     border-radius:12px;
     touch-action:none;
     display:block;
   }
-  .info{
+  .info {
     display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
-    gap:8px;
-    font-size:0.85rem;
-    margin-top:4px;
+    grid-template-columns: repeat(auto-fit,minmax(100px,1fr));
+    gap:6px;
+    font-size:0.75rem;
   }
-  .info div{
-    background:rgba(255,255,255,0.04);
-    padding:8px 12px;
+  .info div {
+    background: rgba(255,255,255,0.045);
+    padding:8px 11px;
     border-radius:10px;
     display:flex;
-    align-items:center;
-    gap:6px;
-    flex-wrap:wrap;
+    flex-direction:column;
+    gap:3px;
+    position:relative;
   }
-  .score{
-    font-weight:600;
+  .info strong {
+    display:block;
+    font-size:0.95rem;
   }
-  .messages{
-    margin-top:4px;
-    background:rgba(255,255,255,0.02);
+  .message-box {
+    background: rgba(255,255,255,0.03);
     padding:10px 14px;
     border-radius:10px;
-    font-size:0.95rem;
+    font-size:0.9rem;
     min-height:48px;
     display:flex;
     align-items:center;
     justify-content:center;
     position:relative;
-    overflow:hidden;
   }
-  .controls{
+  .controls {
     display:flex;
     flex-wrap:wrap;
     gap:10px;
-    margin-top:4px;
   }
-  button{
-    padding:12px 18px;
+  button {
+    padding:14px 16px;
     border:none;
     cursor:pointer;
     border-radius:999px;
     font-weight:600;
     font-size:1rem;
-    background:linear-gradient(135deg,var(--accent) 0%,#ff9f43 80%);
+    background: linear-gradient(135deg,var(--accent1) 10%, var(--accent2) 90%);
     color:#fff;
     flex:1;
-    min-width:120px;
+    min-width:100px;
     position:relative;
     overflow:hidden;
-    transition:transform .2s;
-    box-shadow:0 12px 30px -5px rgba(255,107,107,0.6);
+    transition: transform var(--transition), filter .2s;
+    box-shadow:0 15px 40px -5px rgba(255,107,107,0.55);
   }
-  button:active{transform:scale(.95);}
-  .secondary{
+  button:active { transform:scale(.95); }
+  .secondary {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    box-shadow:0 15px 40px -5px rgba(0,0,0,0.3);
+  }
+  .help-badge {
+    position:fixed;
+    bottom:16px;
+    right:16px;
     background:rgba(255,255,255,0.07);
-    color:#e3e8ff;
-    box-shadow:0 12px 30px -5px rgba(0,0,0,0.3);
+    border-radius:50%;
+    width:48px;
+    height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    cursor:pointer;
+    box-shadow:0 20px 50px -10px rgba(0,0,0,0.5);
+    z-index:5;
   }
-  footer{
+  .footer {
     margin-top:auto;
     text-align:center;
-    font-size:0.8rem;
-    color:var(--muted);
+    font-size:0.68rem;
+    color: var(--muted);
   }
-  .overlay{
+  .overlay {
     position:fixed;
     inset:0;
     background:rgba(15,17,26,0.95);
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:20px;
-    z-index:10;
+    padding:16px;
+    z-index:100;
   }
-  .card{
+  .card {
     background: var(--card);
-    padding:24px 30px;
-    border-radius:20px;
-    max-width:500px;
+    padding:22px 26px;
+    border-radius:18px;
+    max-width:480px;
     width:100%;
     position:relative;
-    box-shadow:var(--shadow);
+    box-shadow: var(--shadow);
     display:flex;
     flex-direction:column;
-    gap:14px;
+    gap:12px;
   }
-  .close-btn{
+  .close-btn {
     position:absolute;
-    top:14px;
-    right:14px;
+    top:10px;
+    right:10px;
     background:rgba(255,255,255,0.07);
     border:none;
     width:32px;
@@ -184,544 +213,590 @@
     font-size:18px;
     color:#fff;
   }
-  .confetti{
+  .confetti {
     position:absolute;
     inset:0;
     pointer-events:none;
     overflow:hidden;
   }
-  .heart{
-    animation:beat .8s ease-in-out infinite;
+  .tag {
+    background:rgba(255,255,255,0.08);
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:0.55rem;
     display:inline-block;
+    margin-right:4px;
   }
-  @keyframes beat{
-    0%,100%{transform:scale(1);}
-    50%{transform:scale(1.15);}
+  .mobile-hint {
+    background:rgba(255,255,255,0.05);
+    padding:6px 10px;
+    border-radius:10px;
+    font-size:0.65rem;
+    display:flex;
+    gap:6px;
+    align-items:center;
   }
-  .small{
-    font-size:0.78rem;
+  @media (max-width:480px){
+    h1{font-size:1.4rem;}
+    button{font-size:0.95rem;}
+    .info{font-size:0.7rem;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
   }
 </style>
 </head>
 <body>
-  <div class="container" aria-label="Baby Bump Defender игра">
-    <header>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+  <div class="app" aria-label="Игра Baby Bump Defender">
+    <header aria-label="Заголовок и персонализация">
+      <div>
         <h1>🍼 Baby Bump Defender</h1>
-        <div class="small">(для будущей мамы — пусть малыш улыбается)</div>
+        <div class="small">Для будущей мамы — пусть малыш улыбается</div>
       </div>
-      <div class="name-input">
+      <div class="name-section">
         <label for="playerNameInput">Имя:</label>
-        <input id="playerNameInput" placeholder="Любимая" maxlength="20" />
+        <input id="playerNameInput" aria-label="Имя будущей мамы" placeholder="Любимая" maxlength="20" />
       </div>
     </header>
 
-    <div id="game-area">
-      <canvas id="game" aria-label="Игровое поле"></canvas>
-      <div class="info" aria-live="polite">
-        <div>Привет, <strong id="displayName">Любимая</strong>! 😊</div>
-        <div>Счастье малыша: <strong id="happinessDisplay">50</strong>%</div>
-        <div>Уровень: <strong id="levelDisplay">1</strong></div>
-        <div>Лучший уровень: <strong id="bestDisplay">1</strong></div>
+    <!-- подсказка управления -->
+    <div class="mobile-hint" aria-live="polite">
+      <div class="tag">Управление</div> Трогай или перетаскивай пузико внизу, чтобы ловить ❤️ и избегать 💣. Щёлкни по пузику 5 раз — пасхалка. Кнопка «Секрет ❤️» — тёплое сообщение.
+    </div>
+
+    <div id="game-area" aria-label="Игровое игровое поле и статус">
+      <canvas id="game" aria-label="Игровое поле: пузико ловит хорошие вибрации"></canvas>
+
+      <div class="info" aria-label="Панель статуса">
+        <div aria-label="Приветствие">
+          <div class="small">Привет,</div>
+          <strong id="displayName">Любимая</strong>
+        </div>
+        <div aria-label="Счастье малыша">
+          <div class="small">Счастье малыша:</div>
+          <strong id="happinessDisplay">50%</strong>
+        </div>
+        <div aria-label="Текущий уровень">
+          <div class="small">Уровень:</div>
+          <strong id="levelDisplay">1</strong>
+        </div>
+        <div aria-label="Лучший достигнутый уровень">
+          <div class="small">Лучший:</div>
+          <strong id="bestDisplay">1</strong>
+        </div>
       </div>
-      <div class="messages" id="message" aria-live="polite">
+
+      <div class="message-box" id="message" aria-live="polite">
         Собирай хорошие вибрации и избегай стресса! 💖💣
       </div>
     </div>
 
-    <div class="controls">
-      <button id="startBtn">Играть</button>
-      <button id="resetBtn" class="secondary">Сбросить</button>
-      <button id="loveBtn">Секрет ❤️</button>
+    <div class="controls" aria-label="Управляющие кнопки">
+      <button id="startBtn" aria-label="Начать игру">Играть</button>
+      <button id="resetBtn" class="secondary" aria-label="Сбросить прогресс">Сбросить</button>
+      <button id="loveBtn" aria-label="Показать секретное сообщение">Секрет ❤️</button>
     </div>
 
-    <footer>Скоро малыш — а пока: заряд позитива от тебя и игры!</footer>
+    <div class="footer">
+      Скоро малыш — а пока: заряд позитива от тебя и игры!<br />
+      (Имя и лучший уровень сохраняются локально)
+    </div>
   </div>
 
-  <!-- Секретное сообщение -->
-  <div id="overlay" style="display:none;">
-    <div class="overlay" role="dialog" aria-label="Секретное сообщение">
+  <!-- Секретное окно -->
+  <div id="overlay" style="display:none;" aria-hidden="true">
+    <div class="overlay" role="dialog" aria-label="Секретное послание">
       <div class="card">
         <button class="close-btn" aria-label="Закрыть">&times;</button>
         <h2>Тебе от Эдварда</h2>
         <p>Ты уже супергероиня — скоро появится маленький мир, который будет любить тебя безмерно. Спасибо, что ты такая. 💛</p>
         <p>Этот малыш уже чувствует твою заботу. А я считаю дни и улыбаюсь, когда думаю о вас двоих.</p>
-        <p style="margin-top:10px;">Если хочешь, можешь щёлкнуть по пузику несколько раз — там ещё одна маленькая шутка внутри. 😉</p>
-        <div style="display:flex;gap:10px;margin-top:6px;">
+        <p style="margin-top:6px;">Если хочешь, можешь щёлкнуть по пузику 5 раз — там ещё одна маленькая шутка внутри. 😉</p>
+        <div style="display:flex;gap:10px;margin-top:8px;">
           <button id="closeLove" style="flex:1;">Обнять 🤗</button>
         </div>
       </div>
     </div>
   </div>
 
-  <script>
-  // ====== Инициализация ======
-  const canvas = document.getElementById("game");
-  const ctx = canvas.getContext("2d");
-  const messageEl = document.getElementById("message");
-  const displayNameEl = document.getElementById("displayName");
-  const happinessEl = document.getElementById("happinessDisplay");
-  const levelEl = document.getElementById("levelDisplay");
-  const bestEl = document.getElementById("bestDisplay");
-  const nameInput = document.getElementById("playerNameInput");
-  const startBtn = document.getElementById("startBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const loveBtn = document.getElementById("loveBtn");
-  const overlay = document.getElementById("overlay");
-  const closeLove = document.getElementById("closeLove");
-  const closeX = document.querySelector(".close-btn");
+  <!-- Кнопка помощи -->
+  <div class="help-badge" aria-label="Справка" id="helpBtn" title="Как играть?">?</div>
 
-  // сохраняем в localStorage
-  const STORAGE_KEY = "baby_bump_defender_state";
-  let state = {
-    bestLevel: 1,
-    name: "Любимая"
-  };
-  function loadState(){
+  <!-- Справочное модальное -->
+  <div id="helpOverlay" style="display:none;">
+    <div class="overlay" role="dialog" aria-label="Справка игры">
+      <div class="card">
+        <button class="close-btn" aria-label="Закрыть справку">&times;</button>
+        <h2>Как играть</h2>
+        <p>Цель: собрать как можно больше <strong>❤️ хорошие вибрации</strong> и избегать <strong>💣 стрессов</strong>, чтобы поднять настроение малышу.</p>
+        <ul>
+          <li>Трогай/перетаскивай пузико внизу — оно движется за пальцем или мышью.</li>
+          <li>Собирай сердечки, избегай бомб — растёт уровень и счастье.</li>
+          <li>Когда счастье достигает 100%, уровень повышается.</li>
+          <li>Если счастье падает до 0 — игра заканчивается. Можно сбросить и начать заново.</li>
+          <li>Пасхалка: щёлкни по пузику 5 раз подряд — появится тёплое сообщение.</li>
+        </ul>
+        <p>Имя сохраняется автоматически в браузере. Лучший уровень тоже сохраняется.</p>
+        <div style="display:flex;gap:10px;margin-top:6px;">
+          <button id="closeHelp" style="flex:1;">Понятно 👍</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    // === Элементы DOM ===
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const nameInput = document.getElementById("playerNameInput");
+    const displayNameEl = document.getElementById("displayName");
+    const happinessEl = document.getElementById("happinessDisplay");
+    const levelEl = document.getElementById("levelDisplay");
+    const bestEl = document.getElementById("bestDisplay");
+    const messageEl = document.getElementById("message");
+    const startBtn = document.getElementById("startBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const loveBtn = document.getElementById("loveBtn");
+    const overlay = document.getElementById("overlay");
+    const closeLove = document.getElementById("closeLove");
+    const closeX = document.querySelectorAll(".close-btn");
+    const helpBtn = document.getElementById("helpBtn");
+    const helpOverlay = document.getElementById("helpOverlay");
+    const closeHelp = document.getElementById("closeHelp");
+
+    // === Состояние и хранилище ===
+    const STORAGE_KEY = "baby_bump_defender_state_v2";
+    let state = { bestLevel:1, name:"Любимая" };
     try {
-      const s = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if(s){
-        state = {...state, ...s};
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if(saved && typeof saved === "object"){
+        if(typeof saved.bestLevel === "number") state.bestLevel = saved.bestLevel;
+        if(typeof saved.name === "string" && saved.name.trim()) state.name = saved.name.trim();
       }
-    } catch(e){}
+    } catch(e){ /* игнорируем */ }
+
+    // Инициализация UI
     nameInput.value = state.name;
     displayNameEl.textContent = state.name;
     bestEl.textContent = state.bestLevel;
-  }
-  function saveState(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      bestLevel: state.bestLevel,
-      name: state.name
-    }));
-  }
 
-  loadState();
+    // === Игровые переменные ===
+    let gameWidth = 0, gameHeight = 0;
+    const player = { x:0, y:0, w:120, h:28, targetX:0 };
+    let falling = [];
+    let lastSpawn = 0;
+    let spawnInterval = 1000;
+    let happiness = 50;
+    let level = 1;
+    let running = false;
+    let gameOver = false;
+    let difficultyTimer = Date.now();
+    let humorTimer = Date.now();
+    let flash = { color:null, alpha:0 };
+    let bellyClicks = 0;
+    let lastBellyClick = 0;
 
-  // ====== Игровые переменные ======
-  let gameWidth, gameHeight;
-  let player = { x: 0, y: 0, w: 120, h: 24, targetX: 0 };
-  let falling = []; // объекты
-  let lastSpawn = 0;
-  let spawnInterval = 1000;
-  let happiness = 50; // 0..100
-  let level = 1;
-  let running = false;
-  let highScoreLevel = state.bestLevel;
-  let gameOver = false;
-  let spawnTimerId = null;
-  let difficultyTimer = 0;
-  let humorTimer = 0;
-
-  // Адаптация размера
-  function resize(){
-    canvas.width = Math.floor(window.innerWidth * 0.9 * devicePixelRatio);
-    canvas.height = Math.floor((window.innerWidth * 0.9 * (16/9)) * devicePixelRatio);
-    gameWidth = canvas.width / devicePixelRatio;
-    gameHeight = canvas.height / devicePixelRatio;
-    canvas.style.height = (gameHeight / devicePixelRatio) + "px";
-    player.w = Math.max(80, Math.min(160, gameWidth * 0.25));
-    player.y = gameHeight - 40;
-    player.x = gameWidth / 2 - player.w / 2;
-    player.targetX = player.x;
-  }
-  window.addEventListener("resize", resize);
-  resize();
-
-  // ====== События управления ======
-  function pointerMove(e){
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    player.targetX = Math.min(gameWidth - player.w, Math.max(0, x / (rect.width / gameWidth) - player.w/2));
-  }
-  canvas.addEventListener("pointerdown", pointerMove);
-  canvas.addEventListener("pointermove", pointerMove);
-  canvas.addEventListener("touchstart", pointerMove);
-  canvas.addEventListener("touchmove", pointerMove);
-
-  // Щёлк по пузику — пасхалка
-  let bellyClicks = 0;
-  let lastBellyClick = 0;
-  function checkBellyClick(x,y){
-    const now=Date.now();
-    if(now - lastBellyClick > 1000) bellyClicks=0;
-    lastBellyClick=now;
-    // если точка в пределах игрока
-    if(x >= player.x && x <= player.x+player.w && y >= player.y && y <= player.y+player.h){
-      bellyClicks++;
-      if(bellyClicks === 5){
-        showTempMessage("Пузик чувствует любовь! 💜 Спасибо, что ты тут.", 3000);
-        bellyClicks=0;
-      }
+    // === Resize (с дебаунсом) ===
+    let resizeTimeout = null;
+    function resize(){
+      const ratio = window.devicePixelRatio || 1;
+      const maxW = Math.min(window.innerWidth - 24, 480);
+      canvas.width = Math.floor(maxW * ratio);
+      canvas.height = Math.floor((maxW * (16/9)) * ratio);
+      gameWidth = canvas.width / ratio;
+      gameHeight = canvas.height / ratio;
+      canvas.style.height = (gameHeight) + "px";
+      player.w = Math.max(80, Math.min(160, gameWidth * 0.28));
+      player.y = gameHeight - 36;
+      player.targetX = Math.min(Math.max(player.x, 0), gameWidth - player.w);
     }
-  }
-  canvas.addEventListener("click", e => {
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / (rect.width / gameWidth);
-    const y = (e.clientY - rect.top) / (rect.height / gameHeight);
-    checkBellyClick(x,y);
-  });
-
-  // ====== Объекты (падающие) ======
-  function spawnItem(){
-    // тип: heart или stress
-    const type = Math.random() < 0.6 ? "heart" : "stress";
-    const size = type === "heart" ? 36 : 40;
-    const x = Math.random() * (gameWidth - size - 10) + 5;
-    const speed = 1 + level * 0.3 + Math.random() * 0.7; // увеличивается с уровнем
-    falling.push({
-      x, y: -size,
-      size,
-      type,
-      speed,
-      wobble: Math.random()*Math.PI*2,
-      amplitude: 10 + Math.random()*10
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(resize, 60);
     });
-  }
+    resize();
 
-  function resetGame(){
-    falling = [];
-    happiness = 50;
-    level = 1;
-    spawnInterval = 1000;
-    lastSpawn = 0;
-    running = false;
-    gameOver = false;
-    updateUI();
-    showTempMessage("Нажми «Играть», чтобы начать. 👶💖");
-  }
-
-  function startGame(){
-    if(running) return;
-    running = true;
-    gameOver = false;
-    falling = [];
-    happiness = 50;
-    level = 1;
-    spawnInterval = 1000;
-    lastSpawn = Date.now();
-    difficultyTimer = Date.now();
-    humorTimer = Date.now();
-    updateUI();
-    showTempMessage("Поехали! Лови хорошие вибрации и береги малыша. 🛡️");
-    requestAnimationFrame(loop);
-  }
-
-  function updateUI(){
-    happinessEl.textContent = Math.max(0, Math.min(100, Math.round(happiness)));
-    levelEl.textContent = level;
-    bestEl.textContent = state.bestLevel;
-    displayNameEl.textContent = state.name || "Любимая";
-  }
-
-  function showTempMessage(txt,duration=2500){
-    messageEl.textContent = txt;
-    clearTimeout(messageEl._timeout);
-    messageEl._timeout = setTimeout(()=>{
-      if(!gameOver){
-        messageEl.textContent = "Собирай хорошие вибрации и избегай стресса! 💖💣";
-      }
-    },duration);
-  }
-
-  function levelUp(){
-    level++;
-    if(level > state.bestLevel){
-      state.bestLevel = level;
-      saveState();
+    // === Вспомогательные ===
+    function saveState(){
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          bestLevel: state.bestLevel,
+          name: state.name
+        }));
+      } catch(e){}
     }
-    showConfetti();
-    showTempMessage(`Ура! Уровень ${level}! Малыш поднимает настроение! 🎉`, 3500);
-    // чуть быстрее появляется, чуть быстрее падает
-    spawnInterval = Math.max(350, 1000 - (level-1)*100);
-  }
-
-  function gameLost(){
-    running = false;
-    gameOver = true;
-    showTempMessage("Ой! Малыш разозлился от стресса. Сделай паузу, глубоко вдохни. 🌬️", 5000);
-  }
-
-  // ====== Анимация конфетти ======
-  function showConfetti(){
-    const conf = document.createElement("div");
-    conf.className = "confetti";
-    document.body.appendChild(conf);
-    const pieces = [];
-    for(let i=0;i<60;i++){
-      const el = document.createElement("div");
-      el.textContent = "🎈";
-      el.style.position="absolute";
-      el.style.fontSize=(12+Math.random()*18)+"px";
-      el.style.left = (50 + (Math.random()-0.5)*100) + "%";
-      el.style.top = "-10px";
-      el.style.opacity=1;
-      el.style.pointerEvents="none";
-      conf.appendChild(el);
-      const speedY = 1 + Math.random()*2;
-      const drift = (Math.random()-0.5)*1.5;
-      pieces.push({el,speedY,drift});
+    function showTempMessage(txt, duration=2500){
+      messageEl.textContent = txt;
+      clearTimeout(messageEl._timeout);
+      messageEl._timeout = setTimeout(()=>{
+        if(!gameOver){
+          messageEl.textContent = "Собирай хорошие вибрации и избегай стресса! 💖💣";
+        }
+      }, duration);
     }
-    let t=0;
-    const anim = ()=>{
-      t++;
-      pieces.forEach(p=>{
-        const top = parseFloat(p.el.style.top);
-        const left = parseFloat(p.el.style.left);
-        p.el.style.top = top + p.speedY + "px";
-        p.el.style.left = left + p.drift + "px";
-        p.el.style.opacity = Math.max(0, 1 - t/100);
+
+    // === Генерация падающих объектов ===
+    function spawnItem(){
+      if(falling.length > 120) return; // ограничение на массу
+      const type = Math.random() < 0.6 ? "heart" : "stress";
+      const size = type === "heart" ? 34 : 38;
+      const x = Math.random() * (gameWidth - size - 6) + 3;
+      const baseSpeed = 1 + level * 0.25;
+      const speed = baseSpeed + Math.random()*0.6;
+      falling.push({
+        x, y: -size,
+        size,
+        type,
+        speed,
+        wobble: Math.random()*Math.PI*2,
+        amplitude: 6 + Math.random()*6
       });
-      if(t < 100){
-        requestAnimationFrame(anim);
-      } else {
-        conf.remove();
+    }
+
+    // === Сброс/старт ===
+    function resetGame(){
+      falling = [];
+      happiness = 50;
+      level = 1;
+      spawnInterval = 1000;
+      lastSpawn = Date.now();
+      running = false;
+      gameOver = false;
+      updateUI();
+      showTempMessage("Нажми «Играть», чтобы начать. 👶💖");
+    }
+    function levelUp(){
+      level++;
+      if(level > state.bestLevel){
+        state.bestLevel = level;
+        bestEl.textContent = state.bestLevel;
+        saveState();
       }
-    };
-    requestAnimationFrame(anim);
-  }
-
-  // ====== Основной цикл ======
-  function loop(){
-    if(!running) return;
-    const now = Date.now();
-
-    // спавн
-    if(now - lastSpawn > spawnInterval){
-      spawnItem();
-      lastSpawn = now;
+      showConfetti();
+      showTempMessage(`Ура! Уровень ${level}! Малыш поднимает настроение! 🎉`, 3300);
+      spawnInterval = Math.max(350, 1000 - (level-1)*90);
+    }
+    function gameLost(){
+      running = false;
+      gameOver = true;
+      showTempMessage("Ой! Малыш разозлился от стресса. Сделай паузу, глубоко вдохни. 🌬️", 4500);
     }
 
-    // усложнение: каждые 15 секунд чуть-чуть ускоряем (мягко)
-    if(now - difficultyTimer > 15000){
-      difficultyTimer = now;
-      if(spawnInterval > 400){
-        spawnInterval -= 50;
+    function updateUI(){
+      happinessEl.textContent = Math.max(0, Math.min(100, Math.round(happiness))) + "%";
+      levelEl.textContent = level;
+      bestEl.textContent = state.bestLevel;
+      displayNameEl.textContent = state.name || "Любимая";
+    }
+
+    // === Анимация конфетти ===
+    function showConfetti(){
+      const conf = document.createElement("div");
+      conf.className = "confetti";
+      document.body.appendChild(conf);
+      const pieces = [];
+      for(let i=0;i<50;i++){
+        const el = document.createElement("div");
+        el.textContent = ["🎈","✨","💫"][Math.floor(Math.random()*3)];
+        el.style.position="absolute";
+        el.style.fontSize=(12+Math.random()*16)+"px";
+        el.style.left = (50 + (Math.random()-0.5)*120) + "%";
+        el.style.top = "-10px";
+        el.style.opacity=1;
+        el.style.pointerEvents="none";
+        conf.appendChild(el);
+        const speedY = 1 + Math.random()*2;
+        const drift = (Math.random()-0.5)*1.2;
+        pieces.push({el,speedY,drift});
       }
-    }
-
-    // иногда вставляем юмор
-    if(now - humorTimer > 12000){
-      humorTimer = now;
-      const jokes = [
-        "Малыш шепчет: «ещё одно сердечко, пожалуйста» 💕",
-        "Стресс пытается пробраться — не пускай его! 🚫",
-        "Счастье малыша растёт, как твои суперсилы 💪",
-        "Пузико говорит: «ещё чуть-чуть!» 😄",
-        "Собирай вибрации, как собирают обнимашки 🤗",
-      ];
-      const pick = jokes[Math.floor(Math.random()*jokes.length)];
-      showTempMessage(pick, 2500);
-    }
-
-    // движение игрока к цели (плавно)
-    player.x += (player.targetX - player.x) * 0.2;
-
-    // обновление падающих
-    falling.forEach(o => {
-      o.y += o.speed;
-      o.wobble += 0.05;
-      // слегка покачивание
-      o.x += Math.sin(o.wobble) * 0.2;
-    });
-
-    // проверка столкновений
-    falling = falling.filter(o => {
-      // если дошло до дна — просто уходит
-      if(o.y > gameHeight + 60) return false;
-      // проверка пересечения с игроком
-      if(
-        o.x + o.size > player.x &&
-        o.x < player.x + player.w &&
-        o.y + o.size > player.y &&
-        o.y < player.y + player.h
-      ){
-        if(o.type === "heart"){
-          happiness = Math.min(100, happiness + 7 + Math.random()*3);
-        } else if(o.type === "stress"){
-          happiness -= 12 + Math.random()*6;
+      let t=0;
+      const anim = ()=>{
+        t++;
+        pieces.forEach(p=>{
+          const top = parseFloat(p.el.style.top);
+          const left = parseFloat(p.el.style.left);
+          p.el.style.top = top + p.speedY + "px";
+          p.el.style.left = left + p.drift + "px";
+          p.el.style.opacity = Math.max(0, 1 - t/100);
+        });
+        if(t < 100){
+          requestAnimationFrame(anim);
+        } else {
+          conf.remove();
         }
-        // эффект маленький
-        flashEffect(o.type === "heart" ? "#55ff99" : "#ff5555");
-        return false;
-      }
-      return true;
-    });
-
-    // уровни / поражение
-    if(happiness >= 100){
-      happiness = 50 + Math.random()*10;
-      levelUp();
-    } else if(happiness <= 0){
-      happiness = 0;
-      gameLost();
+      };
+      requestAnimationFrame(anim);
     }
 
-    updateUI();
-    draw();
+    // === Цикл игры ===
+    function loop(){
+      if(!running) return;
+      const now = Date.now();
 
-    if(running) requestAnimationFrame(loop);
-  }
+      if(now - lastSpawn > spawnInterval){
+        spawnItem();
+        lastSpawn = now;
+      }
+      if(now - difficultyTimer > 15000){
+        difficultyTimer = now;
+        if(spawnInterval > 400) spawnInterval -= 35;
+      }
+      if(now - humorTimer > 12000){
+        humorTimer = now;
+        const jokes = [
+          "Малыш шепчет: «ещё одно сердечко, пожалуйста» 💕",
+          "Стресс пытается пробраться — не пускай его! 🚫",
+          "Счастье малыша растёт, как твои суперсилы 💪",
+          "Пузико говорит: «ещё чуть-чуть!» 😄",
+          "Собирай вибрации, как обнимашки 🤗"
+        ];
+        showTempMessage(jokes[Math.floor(Math.random()*jokes.length)], 2200);
+      }
 
-  // мерцание по краям при сборе/попадании
-  let flash = {color:null, alpha:0};
-  function flashEffect(color){
-    flash.color = color;
-    flash.alpha = 0.6;
-    setTimeout(()=>{ flash.alpha=0; },120);
-  }
+      // плавное движение игрока
+      player.x += (player.targetX - player.x)*0.2;
+      if(player.x < 0) player.x = 0;
+      if(player.x + player.w > gameWidth) player.x = gameWidth - player.w;
 
-  // ====== Рисовалка ======
-  function draw(){
-    // чистим
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.save();
-    ctx.scale(devicePixelRatio,devicePixelRatio);
+      // обновление объектов и столкновений
+      falling = falling.filter(o => {
+        o.y += o.speed;
+        o.wobble += 0.04;
+        o.x += Math.sin(o.wobble) * 0.15;
+        if(o.y > gameHeight + 60) return false;
+        if(o.x + o.size > player.x &&
+           o.x < player.x + player.w &&
+           o.y + o.size > player.y &&
+           o.y < player.y + player.h){
+          if(o.type === "heart"){
+            happiness = Math.min(100, happiness + 6 + Math.random()*4);
+          } else {
+            happiness -= 11 + Math.random()*5;
+          }
+          flash.color = o.type === "heart" ? "#55ff99" : "#ff5555";
+          flash.alpha = 0.5;
+          setTimeout(()=>{ flash.alpha = 0; }, 120);
+          return false;
+        }
+        return true;
+      });
 
-    // фон градиент (тонкий)
-    const g = ctx.createLinearGradient(0,0,0,gameHeight);
-    g.addColorStop(0, "#1f233c");
-    g.addColorStop(1, "#0f111a");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,gameWidth,gameHeight);
+      if(happiness >= 100){
+        happiness = 50 + Math.random()*7;
+        levelUp();
+      } else if(happiness <= 0){
+        happiness = 0;
+        gameLost();
+      }
 
-    // падающие объекты
-    falling.forEach(o => {
+      updateUI();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    // === Рисование ===
+    function draw(){
+      const ratio = window.devicePixelRatio || 1;
       ctx.save();
-      ctx.translate(o.x + o.size/2, o.y + o.size/2);
-      if(o.type === "heart"){
-        ctx.font = (o.size) + "px system-ui, apple-system";
-        ctx.textAlign="center";
-        ctx.textBaseline="middle";
-        ctx.fillText("❤️", 0, 0);
-      } else if(o.type === "stress"){
-        ctx.font = (o.size) + "px system-ui, apple-system";
-        ctx.textAlign="center";
-        ctx.textBaseline="middle";
-        ctx.fillText("💣", 0, 0);
-      }
-      ctx.restore();
-    });
-
-    // игрок (пузо)
-    ctx.save();
-    // тень
-    ctx.fillStyle = "rgba(255,255,255,0.04)";
-    ctx.roundRect(player.x -4, player.y + 4, player.w + 8, player.h + 8, 12);
-    ctx.fill();
-
-    // сам пузик
-    ctx.fillStyle = "#ff9f43";
-    ctx.roundRect(player.x, player.y, player.w, player.h, 12);
-    ctx.fill();
-
-    // на пузике: emoji малыша
-    ctx.font = "18px system-ui";
-    ctx.fillStyle = "#fff";
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    ctx.fillText("🤰", player.x + player.w/2, player.y + player.h/2 -2);
-    ctx.restore();
-
-    // рамка счастья (внизу)
-    // эффект вспышки
-    if(flash.alpha > 0){
-      ctx.fillStyle = flash.color;
-      ctx.globalAlpha = flash.alpha;
+      ctx.scale(ratio, ratio);
+      // фон
+      const grad = ctx.createLinearGradient(0,0,0,gameHeight);
+      grad.addColorStop(0, "#1f233c");
+      grad.addColorStop(1, "#0f111a");
+      ctx.fillStyle = grad;
       ctx.fillRect(0,0,gameWidth,gameHeight);
-      ctx.globalAlpha = 1;
+
+      // падающие
+      falling.forEach(o => {
+        ctx.save();
+        ctx.translate(o.x + o.size/2, o.y + o.size/2);
+        ctx.font = o.size + "px system-ui, apple-system";
+        ctx.textAlign="center";
+        ctx.textBaseline="middle";
+        if(o.type === "heart"){
+          ctx.fillText("❤️", 0, 0);
+        } else {
+          ctx.fillText("💣", 0, 0);
+        }
+        ctx.restore();
+      });
+
+      // игрок (пузико)
+      ctx.save();
+      // тень
+      ctx.fillStyle = "rgba(255,255,255,0.04)";
+      roundRect(ctx, player.x -4, player.y +4, player.w +8, player.h +8, 12);
+      ctx.fill();
+      // пузико
+      ctx.fillStyle = "#ff9f43";
+      roundRect(ctx, player.x, player.y, player.w, player.h, 12);
+      ctx.fill();
+      ctx.font = "16px system-ui";
+      ctx.fillStyle = "#fff";
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.fillText("🤰", player.x + player.w/2, player.y + player.h/2 -1);
+      ctx.restore();
+
+      // флэш эффект
+      if(flash.alpha > 0){
+        ctx.fillStyle = flash.color;
+        ctx.globalAlpha = flash.alpha;
+        ctx.fillRect(0,0,gameWidth,gameHeight);
+        ctx.globalAlpha = 1;
+      }
+
+      // панель счастья
+      const barW = gameWidth * 0.78;
+      const barH = 14;
+      const barX = (gameWidth - barW)/2;
+      const barY = 10;
+      ctx.lineWidth=0;
+      ctx.fillStyle = "#1f2135";
+      roundRect(ctx, barX, barY, barW, barH, 8);
+      ctx.fill();
+      const fillW = (happiness/100)*barW;
+      const grad2 = ctx.createLinearGradient(barX,0,barX+barW,0);
+      grad2.addColorStop(0, "#55ff99");
+      grad2.addColorStop(1, "#ffeb3b");
+      ctx.fillStyle = grad2;
+      roundRect(ctx, barX, barY, fillW, barH, 8);
+      ctx.fill();
+      ctx.strokeStyle = "#444b9b";
+      ctx.lineWidth=1;
+      roundRect(ctx, barX, barY, barW, barH, 8);
+      ctx.stroke();
+      ctx.font = "12px system-ui";
+      ctx.fillStyle = "#fff";
+      ctx.textAlign="center";
+      ctx.fillText("Счастье малыша", barX + barW/2, barY + barH + 14);
+
+      ctx.restore();
     }
 
-    // градиентная полоска счастья
-    const barW = gameWidth * 0.8;
-    const barH = 14;
-    const barX = (gameWidth - barW)/2;
-    const barY = 8;
-    ctx.lineWidth=0;
-    // фон
-    ctx.fillStyle = "#1f2135";
-    ctx.roundRect(barX, barY, barW, barH, 8);
-    ctx.fill();
-    // заполнение
-    const fillW = (happiness/100) * barW;
-    const grad = ctx.createLinearGradient(barX,0,barX+barW,0);
-    grad.addColorStop(0, "#55ff99");
-    grad.addColorStop(1, "#ffeb3b");
-    ctx.fillStyle = grad;
-    ctx.roundRect(barX, barY, fillW, barH, 8);
-    ctx.fill();
-    // рамка
-    ctx.strokeStyle = "#444b9b";
-    ctx.lineWidth=1;
-    ctx.roundRect(barX, barY, barW, barH, 8);
-    ctx.stroke();
+    // округлённый прямоугольник
+    function roundRect(ctx,x,y,w,h,r){
+      if(typeof r === "number") r = {tl:r,tr:r,br:r,bl:r};
+      ctx.beginPath();
+      ctx.moveTo(x + r.tl, y);
+      ctx.lineTo(x + w - r.tr, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+      ctx.lineTo(x + w, y + h - r.br);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+      ctx.lineTo(x + r.bl, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+      ctx.lineTo(x, y + r.tl);
+      ctx.quadraticCurveTo(x, y, x + r.tl, y);
+      ctx.closePath();
+    }
 
-    // подпись
-    ctx.font = "12px system-ui";
-    ctx.fillStyle = "#fff";
-    ctx.textAlign="center";
-    ctx.fillText("Счастье малыша", barX + barW/2, barY + barH + 14);
+    // === Управление ===
+    function pointerMove(e){
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const x = clientX - rect.left;
+      const scale = gameWidth / rect.width;
+      player.targetX = Math.min(Math.max(x * scale - player.w/2, 0), gameWidth - player.w);
+    }
+    canvas.addEventListener("pointerdown", pointerMove, {passive:true});
+    canvas.addEventListener("pointermove", pointerMove, {passive:true});
+    canvas.addEventListener("touchstart", pointerMove, {passive:true});
+    canvas.addEventListener("touchmove", pointerMove, {passive:true});
 
-    ctx.restore();
-  }
-
-  // маленькая утилита: roundRect (в браузерах дублируется если не поддерживается)
-  if (!CanvasRenderingContext2D.prototype.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-      if (w < 0) { x = x + w; w = -w; }
-      if (h < 0) { y = y + h; h = -h; }
-      if (typeof r === "number") r = { tl: r, tr: r, br: r, bl: r };
-      else {
-        const defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
-        for (let side in defaultRadius) {
-          r[side] = r[side] || defaultRadius[side];
+    // пасхалка: клики по пузику
+    canvas.addEventListener("click", e => {
+      const rect = canvas.getBoundingClientRect();
+      const scale = gameWidth / rect.width;
+      const x = (e.clientX - rect.left)*scale;
+      const y = (e.clientY - rect.top)*(gameHeight / rect.height);
+      const now = Date.now();
+      if(now - lastBellyClick > 1000) bellyClicks = 0;
+      lastBellyClick = now;
+      if(x >= player.x && x <= player.x + player.w && y >= player.y && y <= player.y + player.h){
+        bellyClicks++;
+        if(bellyClicks === 5){
+          showTempMessage("Пузик чувствует любовь! 💜 Спасибо, что ты тут.", 3000);
+          bellyClicks = 0;
         }
       }
-      this.beginPath();
-      this.moveTo(x + r.tl, y);
-      this.lineTo(x + w - r.tr, y);
-      this.quadraticCurveTo(x + w, y, x + w, y + r.tr);
-      this.lineTo(x + w, y + h - r.br);
-      this.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
-      this.lineTo(x + r.bl, y + h);
-      this.quadraticCurveTo(x, y + h, x, y + h - r.bl);
-      this.lineTo(x, y + r.tl);
-      this.quadraticCurveTo(x, y, x + r.tl, y);
-      this.closePath();
-      return this;
-    };
-  }
+    });
 
-  // ====== Обработчики интерфейса ======
-  startBtn.addEventListener("click", startGame);
-  resetBtn.addEventListener("click", ()=>{
-    state.bestLevel = 1;
-    saveState();
+    // === Кнопки ===
+    function startGame(){
+      if(running) return;
+      running = true;
+      gameOver = false;
+      falling = [];
+      happiness = 50;
+      level = 1;
+      spawnInterval = 1000;
+      lastSpawn = Date.now();
+      difficultyTimer = Date.now();
+      humorTimer = Date.now();
+      updateUI();
+      showTempMessage("Поехали! Лови хорошие вибрации и береги малыша. 🛡️");
+      requestAnimationFrame(loop);
+    }
+    function resetAll(){
+      state.bestLevel = 1;
+      saveState();
+      resetGame();
+      updateUI();
+    }
+
+    startBtn.addEventListener("click", startGame);
+    resetBtn.addEventListener("click", resetAll);
+    loveBtn.addEventListener("click", ()=> {
+      overlay.style.display="block";
+      overlay.setAttribute("aria-hidden","false");
+    });
+    closeLove.addEventListener("click", ()=> {
+      overlay.style.display="none";
+      overlay.setAttribute("aria-hidden","true");
+    });
+    closeX.forEach(b=> b.addEventListener("click", ()=> {
+      helpOverlay.style.display = "none";
+      overlay.style.display="none";
+      helpOverlay.setAttribute("aria-hidden","true");
+      overlay.setAttribute("aria-hidden","true");
+    }));
+
+    nameInput.addEventListener("input", e => {
+      const v = e.target.value.trim();
+      state.name = v || "Любимая";
+      displayNameEl.textContent = state.name;
+      saveState();
+    });
+
+    helpBtn.addEventListener("click", ()=> {
+      helpOverlay.style.display = "block";
+      helpOverlay.setAttribute("aria-hidden","false");
+    });
+    closeHelp.addEventListener("click", ()=> {
+      helpOverlay.style.display = "none";
+      helpOverlay.setAttribute("aria-hidden","true");
+    });
+
+    helpOverlay.addEventListener("click", e => {
+      if(e.target === helpOverlay) {
+        helpOverlay.style.display="none";
+        helpOverlay.setAttribute("aria-hidden","true");
+      }
+    });
+    overlay.addEventListener("click", e => {
+      if(e.target === overlay){
+        overlay.style.display="none";
+        overlay.setAttribute("aria-hidden","true");
+      }
+    });
+
+    // === Стартовое состояние ===
     resetGame();
-    updateUI();
-  });
-  loveBtn.addEventListener("click", ()=> {
-    overlay.style.display="block";
-  });
-  closeLove.addEventListener("click", ()=> overlay.style.display="none");
-  closeX.addEventListener("click", ()=> overlay.style.display="none");
-  overlay.addEventListener("click", (e)=>{
-    if(e.target === overlay) overlay.style.display="none";
-  });
 
-  nameInput.addEventListener("input", e=>{
-    const v = e.target.value.trim();
-    state.name = v || "Любимая";
-    saveState();
-    displayNameEl.textContent = state.name;
-  });
-
-  // стартовое сообщение
-  resetGame();
-
-  // сохранение best level при выходе
-  window.addEventListener("beforeunload", ()=>{
-    saveState();
-  });
+    // === Сохраняем при уходе ===
+    window.addEventListener("beforeunload", saveState);
+  })();
   </script>
 </body>
 </html>
