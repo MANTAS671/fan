@@ -1,802 +1,318 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
-<title>Baby Bump Defender</title>
-<meta name="description" content="Игра для будущей мамы: собирай хорошие вибрации (❤️), избегай стресса (💣), дари малышу счастье.">
-<style>
-  :root {
-    --bg:#0f111a;
-    --card:#1f2135;
-    --radius:14px;
-    --accent1:#ff6b6b;
-    --accent2:#ff9f43;
-    --text:#e3e8ff;
-    --muted:#8f97b3;
-    --shadow:0 25px 60px -10px rgba(0,0,0,0.45);
-    --transition:.18s cubic-bezier(.22,.61,.36,1);
-    font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  }
-  *{box-sizing:border-box;}
-  body {
-    margin:0;
-    min-height:100vh;
-    background: linear-gradient(135deg,#0f111a 0%,#1f2135 90%);
-    color: var(--text);
-    -webkit-font-smoothing:antialiased;
-    line-height:1.2;
-    display:flex;
-    justify-content:center;
-    padding:12px 8px;
-  }
-  .app {
-    width:100%;
-    max-width:500px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    position:relative;
-  }
-  header {
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:space-between;
-    gap:8px;
-    align-items:flex-start;
-  }
-  h1 {
-    margin:0;
-    font-size:1.5rem;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .small {
-    font-size:0.65rem;
-    color: var(--muted);
-    margin-top:2px;
-  }
-  .name-section {
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    align-items:center;
-    font-size:0.8rem;
-  }
-  .name-section label {
-    flex-shrink:0;
-  }
-  .name-section input {
-    padding:8px 14px;
-    border-radius:999px;
-    border:none;
-    outline:none;
-    font-size:0.9rem;
-    background: rgba(255,255,255,0.06);
-    color:#fff;
-    min-width:130px;
-    flex:1;
-  }
-  #game-area {
-    position:relative;
-    background:rgba(255,255,255,0.02);
-    border-radius:16px;
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    padding:12px 12px 6px;
-  }
-  canvas {
-    width:100%;
-    aspect-ratio:9/16;
-    background: linear-gradient(135deg,#1f233c,#0f111a);
-    border-radius:12px;
-    touch-action:none;
-    display:block;
-  }
-  .info {
-    display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(100px,1fr));
-    gap:6px;
-    font-size:0.75rem;
-  }
-  .info div {
-    background: rgba(255,255,255,0.045);
-    padding:8px 11px;
-    border-radius:10px;
-    display:flex;
-    flex-direction:column;
-    gap:3px;
-    position:relative;
-  }
-  .info strong {
-    display:block;
-    font-size:0.95rem;
-  }
-  .message-box {
-    background: rgba(255,255,255,0.03);
-    padding:10px 14px;
-    border-radius:10px;
-    font-size:0.9rem;
-    min-height:48px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-  }
-  .controls {
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-  }
-  button {
-    padding:14px 16px;
-    border:none;
-    cursor:pointer;
-    border-radius:999px;
-    font-weight:600;
-    font-size:1rem;
-    background: linear-gradient(135deg,var(--accent1) 10%, var(--accent2) 90%);
-    color:#fff;
-    flex:1;
-    min-width:100px;
-    position:relative;
-    overflow:hidden;
-    transition: transform var(--transition), filter .2s;
-    box-shadow:0 15px 40px -5px rgba(255,107,107,0.55);
-  }
-  button:active { transform:scale(.95); }
-  .secondary {
-    background: rgba(255,255,255,0.08);
-    color: var(--text);
-    box-shadow:0 15px 40px -5px rgba(0,0,0,0.3);
-  }
-  .help-badge {
-    position:fixed;
-    bottom:16px;
-    right:16px;
-    background:rgba(255,255,255,0.07);
-    border-radius:50%;
-    width:48px;
-    height:48px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:22px;
-    cursor:pointer;
-    box-shadow:0 20px 50px -10px rgba(0,0,0,0.5);
-    z-index:5;
-  }
-  .footer {
-    margin-top:auto;
-    text-align:center;
-    font-size:0.68rem;
-    color: var(--muted);
-  }
-  .overlay {
-    position:fixed;
-    inset:0;
-    background:rgba(15,17,26,0.95);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-    z-index:100;
-  }
-  .card {
-    background: var(--card);
-    padding:22px 26px;
-    border-radius:18px;
-    max-width:480px;
-    width:100%;
-    position:relative;
-    box-shadow: var(--shadow);
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-  .close-btn {
-    position:absolute;
-    top:10px;
-    right:10px;
-    background:rgba(255,255,255,0.07);
-    border:none;
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-    color:#fff;
-  }
-  .confetti {
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    overflow:hidden;
-  }
-  .tag {
-    background:rgba(255,255,255,0.08);
-    padding:2px 8px;
-    border-radius:999px;
-    font-size:0.55rem;
-    display:inline-block;
-    margin-right:4px;
-  }
-  .mobile-hint {
-    background:rgba(255,255,255,0.05);
-    padding:6px 10px;
-    border-radius:10px;
-    font-size:0.65rem;
-    display:flex;
-    gap:6px;
-    align-items:center;
-  }
-  @media (max-width:480px){
-    h1{font-size:1.4rem;}
-    button{font-size:0.95rem;}
-    .info{font-size:0.7rem;}
-  }
-  @media (prefers-reduced-motion: reduce){
-    *{animation:none !important; transition:none !important;}
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>История Татьяны и Эдварда</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(120deg, #181824 0%, #23243a 100%);
+      color: #fff;
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .container {
+      background: rgba(34,36,64,0.85);
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.45);
+      border-radius: 2rem;
+      padding: 2rem 1.5rem;
+      max-width: 440px;
+      width: 96vw;
+      margin: 1.5rem auto;
+      animation: fadein 1.4s cubic-bezier(.6,0,.4,1);
+    }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .story {
+      font-size: 1.19rem;
+      margin-bottom: 1.3rem;
+      line-height: 1.6;
+      min-height: 76px;
+      transition: all .3s;
+    }
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .choice-btn {
+      background: linear-gradient(90deg, #45b4ff 0%, #6642f5 100%);
+      color: #fff;
+      border: none;
+      padding: 0.86rem 1.2rem;
+      font-size: 1.02rem;
+      border-radius: 1.2rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      box-shadow: 0 2px 8px 0 rgba(80,110,255,0.15);
+      transition: all .15s;
+    }
+    .choice-btn:hover, .choice-btn:focus {
+      background: linear-gradient(90deg, #6ad1fc 0%, #7e63fc 100%);
+      box-shadow: 0 6px 16px 0 rgba(80,110,255,0.23);
+      outline: none;
+    }
+    .ending {
+      font-size: 1.18rem;
+      padding: 1.4rem 0 0.6rem 0;
+      color: #aee1ff;
+      font-weight: 600;
+      line-height: 1.7;
+      text-align: center;
+      min-height: 80px;
+    }
+    .restart-btn {
+      margin: 1.1rem auto 0 auto;
+      display: block;
+      background: linear-gradient(90deg, #2ef09a 0%, #55c5f2 100%);
+      color: #222;
+      font-weight: 700;
+      border: none;
+      padding: 0.9rem 2.4rem;
+      font-size: 1.11rem;
+      border-radius: 1.1rem;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .restart-btn:hover {
+      background: linear-gradient(90deg, #66fec5 0%, #84daff 100%);
+    }
+    @media (max-width: 500px) {
+      .container { padding: 1.1rem 0.4rem; border-radius: 1.1rem; }
+      .story { font-size: 1rem; min-height: 50px; }
+      .choice-btn { font-size: .93rem; padding: 0.7rem 0.7rem; border-radius: 1rem; }
+      .ending { font-size: 1.02rem; }
+    }
+  </style>
 </head>
 <body>
-  <div class="app" aria-label="Игра Baby Bump Defender">
-    <header aria-label="Заголовок и персонализация">
-      <div>
-        <h1>🍼 Baby Bump Defender</h1>
-        <div class="small">Для будущей мамы — пусть малыш улыбается</div>
-      </div>
-      <div class="name-section">
-        <label for="playerNameInput">Имя:</label>
-        <input id="playerNameInput" aria-label="Имя будущей мамы" placeholder="Любимая" maxlength="20" />
-      </div>
-    </header>
-
-    <!-- подсказка управления -->
-    <div class="mobile-hint" aria-live="polite">
-      <div class="tag">Управление</div> Трогай или перетаскивай пузико внизу, чтобы ловить ❤️ и избегать 💣. Щёлкни по пузику 5 раз — пасхалка. Кнопка «Секрет ❤️» — тёплое сообщение.
-    </div>
-
-    <div id="game-area" aria-label="Игровое игровое поле и статус">
-      <canvas id="game" aria-label="Игровое поле: пузико ловит хорошие вибрации"></canvas>
-
-      <div class="info" aria-label="Панель статуса">
-        <div aria-label="Приветствие">
-          <div class="small">Привет,</div>
-          <strong id="displayName">Любимая</strong>
-        </div>
-        <div aria-label="Счастье малыша">
-          <div class="small">Счастье малыша:</div>
-          <strong id="happinessDisplay">50%</strong>
-        </div>
-        <div aria-label="Текущий уровень">
-          <div class="small">Уровень:</div>
-          <strong id="levelDisplay">1</strong>
-        </div>
-        <div aria-label="Лучший достигнутый уровень">
-          <div class="small">Лучший:</div>
-          <strong id="bestDisplay">1</strong>
-        </div>
-      </div>
-
-      <div class="message-box" id="message" aria-live="polite">
-        Собирай хорошие вибрации и избегай стресса! 💖💣
-      </div>
-    </div>
-
-    <div class="controls" aria-label="Управляющие кнопки">
-      <button id="startBtn" aria-label="Начать игру">Играть</button>
-      <button id="resetBtn" class="secondary" aria-label="Сбросить прогресс">Сбросить</button>
-      <button id="loveBtn" aria-label="Показать секретное сообщение">Секрет ❤️</button>
-    </div>
-
-    <div class="footer">
-      Скоро малыш — а пока: заряд позитива от тебя и игры!<br />
-      (Имя и лучший уровень сохраняются локально)
-    </div>
+  <div class="container">
+    <div class="story" id="story"></div>
+    <div class="choices" id="choices"></div>
+    <div class="ending" id="ending"></div>
+    <button class="restart-btn" id="restartBtn" style="display:none;">Попробовать другой вариант</button>
   </div>
-
-  <!-- Секретное окно -->
-  <div id="overlay" style="display:none;" aria-hidden="true">
-    <div class="overlay" role="dialog" aria-label="Секретное послание">
-      <div class="card">
-        <button class="close-btn" aria-label="Закрыть">&times;</button>
-        <h2>Тебе от Эдварда</h2>
-        <p>Ты уже супергероиня — скоро появится маленький мир, который будет любить тебя безмерно. Спасибо, что ты такая. 💛</p>
-        <p>Этот малыш уже чувствует твою заботу. А я считаю дни и улыбаюсь, когда думаю о вас двоих.</p>
-        <p style="margin-top:6px;">Если хочешь, можешь щёлкнуть по пузику 5 раз — там ещё одна маленькая шутка внутри. 😉</p>
-        <div style="display:flex;gap:10px;margin-top:8px;">
-          <button id="closeLove" style="flex:1;">Обнять 🤗</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Кнопка помощи -->
-  <div class="help-badge" aria-label="Справка" id="helpBtn" title="Как играть?">?</div>
-
-  <!-- Справочное модальное -->
-  <div id="helpOverlay" style="display:none;">
-    <div class="overlay" role="dialog" aria-label="Справка игры">
-      <div class="card">
-        <button class="close-btn" aria-label="Закрыть справку">&times;</button>
-        <h2>Как играть</h2>
-        <p>Цель: собрать как можно больше <strong>❤️ хорошие вибрации</strong> и избегать <strong>💣 стрессов</strong>, чтобы поднять настроение малышу.</p>
-        <ul>
-          <li>Трогай/перетаскивай пузико внизу — оно движется за пальцем или мышью.</li>
-          <li>Собирай сердечки, избегай бомб — растёт уровень и счастье.</li>
-          <li>Когда счастье достигает 100%, уровень повышается.</li>
-          <li>Если счастье падает до 0 — игра заканчивается. Можно сбросить и начать заново.</li>
-          <li>Пасхалка: щёлкни по пузику 5 раз подряд — появится тёплое сообщение.</li>
-        </ul>
-        <p>Имя сохраняется автоматически в браузере. Лучший уровень тоже сохраняется.</p>
-        <div style="display:flex;gap:10px;margin-top:6px;">
-          <button id="closeHelp" style="flex:1;">Понятно 👍</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script>
-  (function(){
-    // === Элементы DOM ===
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
-    const nameInput = document.getElementById("playerNameInput");
-    const displayNameEl = document.getElementById("displayName");
-    const happinessEl = document.getElementById("happinessDisplay");
-    const levelEl = document.getElementById("levelDisplay");
-    const bestEl = document.getElementById("bestDisplay");
-    const messageEl = document.getElementById("message");
-    const startBtn = document.getElementById("startBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const loveBtn = document.getElementById("loveBtn");
-    const overlay = document.getElementById("overlay");
-    const closeLove = document.getElementById("closeLove");
-    const closeX = document.querySelectorAll(".close-btn");
-    const helpBtn = document.getElementById("helpBtn");
-    const helpOverlay = document.getElementById("helpOverlay");
-    const closeHelp = document.getElementById("closeHelp");
+    const storyEl = document.getElementById('story');
+    const choicesEl = document.getElementById('choices');
+    const endingEl = document.getElementById('ending');
+    const restartBtn = document.getElementById('restartBtn');
 
-    // === Состояние и хранилище ===
-    const STORAGE_KEY = "baby_bump_defender_state_v2";
-    let state = { bestLevel:1, name:"Любимая" };
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if(saved && typeof saved === "object"){
-        if(typeof saved.bestLevel === "number") state.bestLevel = saved.bestLevel;
-        if(typeof saved.name === "string" && saved.name.trim()) state.name = saved.name.trim();
+    const storyTree = {
+      start: {
+        text: 'Эдвард впервые пишет тебе: "Привет, Татьяна! У тебя такая добрая улыбка, что аж захотелось познакомиться." Как отреагируешь?',
+        choices: [
+          { text: 'Ответить шуткой: "Улыбаюсь только когда кофе дали!"', next: 'coffeeJoke' },
+          { text: 'Сделать вид, что занята: "Ой, привет! Сейчас не могу говорить..."', next: 'busy' },
+          { text: 'Сразу по-серьёзному: "Спасибо! А ты чем увлекаешься?"', next: 'seriousStart' }
+        ]
+      },
+      coffeeJoke: {
+        text: 'Эдвард: "Я уже бегу с кофе, как истинный джентльмен!"',
+        choices: [
+          { text: 'Пошутить в ответ: "Тогда бери два, вдруг я захочу ещё!"', next: 'doubleCoffee' },
+          { text: 'Спросить: "А ты вообще умеешь варить кофе?"', next: 'coffeeSkill' }
+        ]
+      },
+      doubleCoffee: {
+        text: 'Эдвард: "Готов даже три! Ради такой девушки всё что угодно."',
+        choices: [
+          { text: 'Поддержать флирт: "Ого, надеюсь без яда!"', next: 'flirt' },
+          { text: 'Перевести на интересы: "Ты всегда такой энергичный?"', next: 'energy' }
+        ]
+      },
+      coffeeSkill: {
+        text: 'Эдвард: "Умею! Но ты меня можешь научить — вдруг твой способ волшебный."',
+        choices: [
+          { text: 'Улыбнуться: "Учитель из меня так себе, но попробую."', next: 'hobbyTalk' },
+          { text: 'Спросить: "Ты вообще часто готовишь?"', next: 'cooking' }
+        ]
+      },
+      busy: {
+        text: 'Ты занята, но Эдвард не сдаётся: "Ладно, я подожду, ты мне уже интересна."',
+        choices: [
+          { text: 'Мило: "Окей, отпишу позже!"', next: 'lateTalk' },
+          { text: 'Сразу спросить, зачем пишет: "Ты всем так пишешь?"', next: 'questionIntent' }
+        ]
+      },
+      lateTalk: {
+        text: 'Позже ты отвечаешь, Эдвард радуется: "Ура, дождался! Как твой день прошёл?"',
+        choices: [
+          { text: 'Кратко: "Обычный день, ничего особенного."', next: 'hobbyTalk' },
+          { text: 'В деталях: "Была куча дел, но теперь отдыхаю."', next: 'movieNight' }
+        ]
+      },
+      questionIntent: {
+        text: 'Эдвард: "Нет, мне только ты понравилась. Правда!"',
+        choices: [
+          { text: 'Поверить: "Ну ладно, поверю на слово."', next: 'hobbyTalk' },
+          { text: 'Сомневаться: "А почему я?"', next: 'whyYou' }
+        ]
+      },
+      seriousStart: {
+        text: 'Эдвард: "Люблю музыку, книги и философию. А ты?"',
+        choices: [
+          { text: 'Рассказать о своих хобби', next: 'hobbyTalk' },
+          { text: 'Пошутить: "А если я скажу, что люблю спать?"', next: 'sleepJoke' }
+        ]
+      },
+      hobbyTalk: {
+        text: 'Вы обмениваетесь хобби. Оказывается, у вас есть общие интересы!',
+        choices: [
+          { text: 'Спросить про любимую музыку', next: 'musicTalk' },
+          { text: 'Узнать, какой он человек: "Ты экстраверт или интроверт?"', next: 'personality' }
+        ]
+      },
+      sleepJoke: {
+        text: 'Эдвард: "Спать — это святое! Но если я буду рядом, ты не уснёшь..."',
+        choices: [
+          { text: 'Посмеяться: "Ну-ну, проверь!"', next: 'flirt' },
+          { text: 'Ответить серьёзно: "Сомневаюсь!"', next: 'flirt' }
+        ]
+      },
+      musicTalk: {
+        text: 'Эдвард: "Я обожаю пианино и иногда играю на гитаре."',
+        choices: [
+          { text: 'Попросить сыграть при встрече', next: 'musicLive' },
+          { text: 'Спросить: "Скинешь видео?"', next: 'musicVideo' }
+        ]
+      },
+      musicLive: {
+        text: 'Эдвард: "Обещаю сыграть для тебя лично!"',
+        choices: [
+          { text: 'Написать: "Договорились!"', next: 'futurePlans' },
+          { text: 'Пошутить: "Если не облажаешься!"', next: 'futurePlans' }
+        ]
+      },
+      musicVideo: {
+        text: 'Эдвард: "Сначала увидимся, а потом — эксклюзив!"',
+        choices: [
+          { text: 'Согласиться: "Интригуешь!"', next: 'futurePlans' },
+          { text: 'Сказать: "Я жду!"', next: 'futurePlans' }
+        ]
+      },
+      personality: {
+        text: 'Эдвард: "Интроверт, но ради тебя могу стать экстравертом."',
+        choices: [
+          { text: 'Пошутить: "Ну посмотрим, какой ты!"', next: 'futurePlans' },
+          { text: 'Сказать: "Интроверты классные."', next: 'futurePlans' }
+        ]
+      },
+      movieNight: {
+        text: 'Эдвард: "Может, вместе посмотрим какой-нибудь фильм онлайн?"',
+        choices: [
+          { text: 'Согласиться', next: 'futurePlans' },
+          { text: 'Пошутить: "А попкорн кто принесёт?"', next: 'futurePlans' }
+        ]
+      },
+      energy: {
+        text: 'Эдвард: "Ты просто вдохновляешь!"',
+        choices: [
+          { text: 'Пошутить: "Смотри, не перегори!"', next: 'flirt' },
+          { text: 'Сказать: "Спасибо, приятно!"', next: 'flirt' }
+        ]
+      },
+      flirt: {
+        text: 'Переписка становится всё более уютной и весёлой. Эдвард явно настроен на флирт!',
+        choices: [
+          { text: 'Ответить взаимно', next: 'futurePlans' },
+          { text: 'Перевести на дружбу', next: 'friendzone' }
+        ]
+      },
+      cooking: {
+        text: 'Эдвард: "Иногда. Но если вместе — готовить веселее!"',
+        choices: [
+          { text: 'Согласиться: "Вдвоём и правда интереснее."', next: 'futurePlans' },
+          { text: 'Пошутить: "Главное — не сжечь кухню."', next: 'futurePlans' }
+        ]
+      },
+      whyYou: {
+        text: 'Эдвард: "Ты очень искренняя, таких мало!"',
+        choices: [
+          { text: 'Растрогаться: "Спасибо!"', next: 'hobbyTalk' },
+          { text: 'Пошутить: "Ну да, я редкий Pokémon."', next: 'hobbyTalk' }
+        ]
+      },
+      futurePlans: {
+        text: 'Проходит время. Переписка уже на другом уровне. Что дальше?',
+        choices: [
+          { text: 'Намекнуть на встречу', next: 'meeting' },
+          { text: 'Пошутить: "Давай не спешить!"', next: 'slowdown' }
+        ]
+      },
+      meeting: {
+        text: 'Эдвард: "С удовольствием приглашу тебя на кофе! Только без подвохов, обещаю."',
+        choices: [
+          { text: 'Согласиться на встречу', next: 'endingDate' },
+          { text: 'Попросить время на подумать', next: 'endingWait' }
+        ]
+      },
+      slowdown: {
+        text: 'Эдвард: "Ладно, буду ждать хоть сто лет! Но фотку члена всё равно не скину ;)"',
+        choices: [
+          { text: 'Рассмеяться: "Ну, хоть это радует!"', next: 'endingFriend' },
+          { text: 'Сказать: "Вдруг захочу попросить?"', next: 'endingTroll' }
+        ]
+      },
+      friendzone: {
+        text: 'Ты перевела разговор в дружбу. Эдвард: "Я рад, что у меня есть такой друг!"',
+        choices: [
+          { text: 'Дружески ответить', next: 'endingFriend' }
+        ]
+      },
+      endingDate: {
+        text: 'Вы встречаетесь, пьёте кофе, смеётесь, и всё складывается отлично! P.S. Нет, Эдвард не собирается скидывать фотку члена. Это наша шутка :)',
+        choices: []
+      },
+      endingWait: {
+        text: 'Ты берёшь паузу. Эдвард терпеливо ждёт. P.S. Нет, Эдвард не собирается скидывать фотку члена. Не проси! :)',
+        choices: []
+      },
+      endingFriend: {
+        text: 'Вы стали классными друзьями, переписываетесь и прикалываетесь друг над другом. Но фоток, о которых все шутят, не будет. Просто дружба :)',
+        choices: []
+      },
+      endingTroll: {
+        text: 'Эдвард смеётся: "Ну, если только в Музее Современного Искусства..." P.S. Нет, Эдвард не собирается скидывать фотку члена. Ну правда!',
+        choices: []
       }
-    } catch(e){ /* игнорируем */ }
+    };
 
-    // Инициализация UI
-    nameInput.value = state.name;
-    displayNameEl.textContent = state.name;
-    bestEl.textContent = state.bestLevel;
+    let current = 'start';
 
-    // === Игровые переменные ===
-    let gameWidth = 0, gameHeight = 0;
-    const player = { x:0, y:0, w:120, h:28, targetX:0 };
-    let falling = [];
-    let lastSpawn = 0;
-    let spawnInterval = 1000;
-    let happiness = 50;
-    let level = 1;
-    let running = false;
-    let gameOver = false;
-    let difficultyTimer = Date.now();
-    let humorTimer = Date.now();
-    let flash = { color:null, alpha:0 };
-    let bellyClicks = 0;
-    let lastBellyClick = 0;
-
-    // === Resize (с дебаунсом) ===
-    let resizeTimeout = null;
-    function resize(){
-      const ratio = window.devicePixelRatio || 1;
-      const maxW = Math.min(window.innerWidth - 24, 480);
-      canvas.width = Math.floor(maxW * ratio);
-      canvas.height = Math.floor((maxW * (16/9)) * ratio);
-      gameWidth = canvas.width / ratio;
-      gameHeight = canvas.height / ratio;
-      canvas.style.height = (gameHeight) + "px";
-      player.w = Math.max(80, Math.min(160, gameWidth * 0.28));
-      player.y = gameHeight - 36;
-      player.targetX = Math.min(Math.max(player.x, 0), gameWidth - player.w);
-    }
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(resize, 60);
-    });
-    resize();
-
-    // === Вспомогательные ===
-    function saveState(){
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          bestLevel: state.bestLevel,
-          name: state.name
-        }));
-      } catch(e){}
-    }
-    function showTempMessage(txt, duration=2500){
-      messageEl.textContent = txt;
-      clearTimeout(messageEl._timeout);
-      messageEl._timeout = setTimeout(()=>{
-        if(!gameOver){
-          messageEl.textContent = "Собирай хорошие вибрации и избегай стресса! 💖💣";
-        }
-      }, duration);
-    }
-
-    // === Генерация падающих объектов ===
-    function spawnItem(){
-      if(falling.length > 120) return; // ограничение на массу
-      const type = Math.random() < 0.6 ? "heart" : "stress";
-      const size = type === "heart" ? 34 : 38;
-      const x = Math.random() * (gameWidth - size - 6) + 3;
-      const baseSpeed = 1 + level * 0.25;
-      const speed = baseSpeed + Math.random()*0.6;
-      falling.push({
-        x, y: -size,
-        size,
-        type,
-        speed,
-        wobble: Math.random()*Math.PI*2,
-        amplitude: 6 + Math.random()*6
+    function renderNode(nodeName) {
+      const node = storyTree[nodeName];
+      storyEl.textContent = node.text;
+      choicesEl.innerHTML = '';
+      endingEl.textContent = '';
+      if (!node.choices || node.choices.length === 0) {
+        endingEl.textContent = 'Конец истории!';
+        restartBtn.style.display = 'block';
+        return;
+      }
+      node.choices.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = choice.text;
+        btn.onclick = () => renderNode(choice.next);
+        choicesEl.appendChild(btn);
       });
+      restartBtn.style.display = 'none';
     }
 
-    // === Сброс/старт ===
-    function resetGame(){
-      falling = [];
-      happiness = 50;
-      level = 1;
-      spawnInterval = 1000;
-      lastSpawn = Date.now();
-      running = false;
-      gameOver = false;
-      updateUI();
-      showTempMessage("Нажми «Играть», чтобы начать. 👶💖");
-    }
-    function levelUp(){
-      level++;
-      if(level > state.bestLevel){
-        state.bestLevel = level;
-        bestEl.textContent = state.bestLevel;
-        saveState();
-      }
-      showConfetti();
-      showTempMessage(`Ура! Уровень ${level}! Малыш поднимает настроение! 🎉`, 3300);
-      spawnInterval = Math.max(350, 1000 - (level-1)*90);
-    }
-    function gameLost(){
-      running = false;
-      gameOver = true;
-      showTempMessage("Ой! Малыш разозлился от стресса. Сделай паузу, глубоко вдохни. 🌬️", 4500);
-    }
-
-    function updateUI(){
-      happinessEl.textContent = Math.max(0, Math.min(100, Math.round(happiness))) + "%";
-      levelEl.textContent = level;
-      bestEl.textContent = state.bestLevel;
-      displayNameEl.textContent = state.name || "Любимая";
-    }
-
-    // === Анимация конфетти ===
-    function showConfetti(){
-      const conf = document.createElement("div");
-      conf.className = "confetti";
-      document.body.appendChild(conf);
-      const pieces = [];
-      for(let i=0;i<50;i++){
-        const el = document.createElement("div");
-        el.textContent = ["🎈","✨","💫"][Math.floor(Math.random()*3)];
-        el.style.position="absolute";
-        el.style.fontSize=(12+Math.random()*16)+"px";
-        el.style.left = (50 + (Math.random()-0.5)*120) + "%";
-        el.style.top = "-10px";
-        el.style.opacity=1;
-        el.style.pointerEvents="none";
-        conf.appendChild(el);
-        const speedY = 1 + Math.random()*2;
-        const drift = (Math.random()-0.5)*1.2;
-        pieces.push({el,speedY,drift});
-      }
-      let t=0;
-      const anim = ()=>{
-        t++;
-        pieces.forEach(p=>{
-          const top = parseFloat(p.el.style.top);
-          const left = parseFloat(p.el.style.left);
-          p.el.style.top = top + p.speedY + "px";
-          p.el.style.left = left + p.drift + "px";
-          p.el.style.opacity = Math.max(0, 1 - t/100);
-        });
-        if(t < 100){
-          requestAnimationFrame(anim);
-        } else {
-          conf.remove();
-        }
-      };
-      requestAnimationFrame(anim);
-    }
-
-    // === Цикл игры ===
-    function loop(){
-      if(!running) return;
-      const now = Date.now();
-
-      if(now - lastSpawn > spawnInterval){
-        spawnItem();
-        lastSpawn = now;
-      }
-      if(now - difficultyTimer > 15000){
-        difficultyTimer = now;
-        if(spawnInterval > 400) spawnInterval -= 35;
-      }
-      if(now - humorTimer > 12000){
-        humorTimer = now;
-        const jokes = [
-          "Малыш шепчет: «ещё одно сердечко, пожалуйста» 💕",
-          "Стресс пытается пробраться — не пускай его! 🚫",
-          "Счастье малыша растёт, как твои суперсилы 💪",
-          "Пузико говорит: «ещё чуть-чуть!» 😄",
-          "Собирай вибрации, как обнимашки 🤗"
-        ];
-        showTempMessage(jokes[Math.floor(Math.random()*jokes.length)], 2200);
-      }
-
-      // плавное движение игрока
-      player.x += (player.targetX - player.x)*0.2;
-      if(player.x < 0) player.x = 0;
-      if(player.x + player.w > gameWidth) player.x = gameWidth - player.w;
-
-      // обновление объектов и столкновений
-      falling = falling.filter(o => {
-        o.y += o.speed;
-        o.wobble += 0.04;
-        o.x += Math.sin(o.wobble) * 0.15;
-        if(o.y > gameHeight + 60) return false;
-        if(o.x + o.size > player.x &&
-           o.x < player.x + player.w &&
-           o.y + o.size > player.y &&
-           o.y < player.y + player.h){
-          if(o.type === "heart"){
-            happiness = Math.min(100, happiness + 6 + Math.random()*4);
-          } else {
-            happiness -= 11 + Math.random()*5;
-          }
-          flash.color = o.type === "heart" ? "#55ff99" : "#ff5555";
-          flash.alpha = 0.5;
-          setTimeout(()=>{ flash.alpha = 0; }, 120);
-          return false;
-        }
-        return true;
-      });
-
-      if(happiness >= 100){
-        happiness = 50 + Math.random()*7;
-        levelUp();
-      } else if(happiness <= 0){
-        happiness = 0;
-        gameLost();
-      }
-
-      updateUI();
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    // === Рисование ===
-    function draw(){
-      const ratio = window.devicePixelRatio || 1;
-      ctx.save();
-      ctx.scale(ratio, ratio);
-      // фон
-      const grad = ctx.createLinearGradient(0,0,0,gameHeight);
-      grad.addColorStop(0, "#1f233c");
-      grad.addColorStop(1, "#0f111a");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0,0,gameWidth,gameHeight);
-
-      // падающие
-      falling.forEach(o => {
-        ctx.save();
-        ctx.translate(o.x + o.size/2, o.y + o.size/2);
-        ctx.font = o.size + "px system-ui, apple-system";
-        ctx.textAlign="center";
-        ctx.textBaseline="middle";
-        if(o.type === "heart"){
-          ctx.fillText("❤️", 0, 0);
-        } else {
-          ctx.fillText("💣", 0, 0);
-        }
-        ctx.restore();
-      });
-
-      // игрок (пузико)
-      ctx.save();
-      // тень
-      ctx.fillStyle = "rgba(255,255,255,0.04)";
-      roundRect(ctx, player.x -4, player.y +4, player.w +8, player.h +8, 12);
-      ctx.fill();
-      // пузико
-      ctx.fillStyle = "#ff9f43";
-      roundRect(ctx, player.x, player.y, player.w, player.h, 12);
-      ctx.fill();
-      ctx.font = "16px system-ui";
-      ctx.fillStyle = "#fff";
-      ctx.textAlign="center";
-      ctx.textBaseline="middle";
-      ctx.fillText("🤰", player.x + player.w/2, player.y + player.h/2 -1);
-      ctx.restore();
-
-      // флэш эффект
-      if(flash.alpha > 0){
-        ctx.fillStyle = flash.color;
-        ctx.globalAlpha = flash.alpha;
-        ctx.fillRect(0,0,gameWidth,gameHeight);
-        ctx.globalAlpha = 1;
-      }
-
-      // панель счастья
-      const barW = gameWidth * 0.78;
-      const barH = 14;
-      const barX = (gameWidth - barW)/2;
-      const barY = 10;
-      ctx.lineWidth=0;
-      ctx.fillStyle = "#1f2135";
-      roundRect(ctx, barX, barY, barW, barH, 8);
-      ctx.fill();
-      const fillW = (happiness/100)*barW;
-      const grad2 = ctx.createLinearGradient(barX,0,barX+barW,0);
-      grad2.addColorStop(0, "#55ff99");
-      grad2.addColorStop(1, "#ffeb3b");
-      ctx.fillStyle = grad2;
-      roundRect(ctx, barX, barY, fillW, barH, 8);
-      ctx.fill();
-      ctx.strokeStyle = "#444b9b";
-      ctx.lineWidth=1;
-      roundRect(ctx, barX, barY, barW, barH, 8);
-      ctx.stroke();
-      ctx.font = "12px system-ui";
-      ctx.fillStyle = "#fff";
-      ctx.textAlign="center";
-      ctx.fillText("Счастье малыша", barX + barW/2, barY + barH + 14);
-
-      ctx.restore();
-    }
-
-    // округлённый прямоугольник
-    function roundRect(ctx,x,y,w,h,r){
-      if(typeof r === "number") r = {tl:r,tr:r,br:r,bl:r};
-      ctx.beginPath();
-      ctx.moveTo(x + r.tl, y);
-      ctx.lineTo(x + w - r.tr, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
-      ctx.lineTo(x + w, y + h - r.br);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
-      ctx.lineTo(x + r.bl, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
-      ctx.lineTo(x, y + r.tl);
-      ctx.quadraticCurveTo(x, y, x + r.tl, y);
-      ctx.closePath();
-    }
-
-    // === Управление ===
-    function pointerMove(e){
-      const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const x = clientX - rect.left;
-      const scale = gameWidth / rect.width;
-      player.targetX = Math.min(Math.max(x * scale - player.w/2, 0), gameWidth - player.w);
-    }
-    canvas.addEventListener("pointerdown", pointerMove, {passive:true});
-    canvas.addEventListener("pointermove", pointerMove, {passive:true});
-    canvas.addEventListener("touchstart", pointerMove, {passive:true});
-    canvas.addEventListener("touchmove", pointerMove, {passive:true});
-
-    // пасхалка: клики по пузику
-    canvas.addEventListener("click", e => {
-      const rect = canvas.getBoundingClientRect();
-      const scale = gameWidth / rect.width;
-      const x = (e.clientX - rect.left)*scale;
-      const y = (e.clientY - rect.top)*(gameHeight / rect.height);
-      const now = Date.now();
-      if(now - lastBellyClick > 1000) bellyClicks = 0;
-      lastBellyClick = now;
-      if(x >= player.x && x <= player.x + player.w && y >= player.y && y <= player.y + player.h){
-        bellyClicks++;
-        if(bellyClicks === 5){
-          showTempMessage("Пузик чувствует любовь! 💜 Спасибо, что ты тут.", 3000);
-          bellyClicks = 0;
-        }
-      }
-    });
-
-    // === Кнопки ===
-    function startGame(){
-      if(running) return;
-      running = true;
-      gameOver = false;
-      falling = [];
-      happiness = 50;
-      level = 1;
-      spawnInterval = 1000;
-      lastSpawn = Date.now();
-      difficultyTimer = Date.now();
-      humorTimer = Date.now();
-      updateUI();
-      showTempMessage("Поехали! Лови хорошие вибрации и береги малыша. 🛡️");
-      requestAnimationFrame(loop);
-    }
-    function resetAll(){
-      state.bestLevel = 1;
-      saveState();
-      resetGame();
-      updateUI();
-    }
-
-    startBtn.addEventListener("click", startGame);
-    resetBtn.addEventListener("click", resetAll);
-    loveBtn.addEventListener("click", ()=> {
-      overlay.style.display="block";
-      overlay.setAttribute("aria-hidden","false");
-    });
-    closeLove.addEventListener("click", ()=> {
-      overlay.style.display="none";
-      overlay.setAttribute("aria-hidden","true");
-    });
-    closeX.forEach(b=> b.addEventListener("click", ()=> {
-      helpOverlay.style.display = "none";
-      overlay.style.display="none";
-      helpOverlay.setAttribute("aria-hidden","true");
-      overlay.setAttribute("aria-hidden","true");
-    }));
-
-    nameInput.addEventListener("input", e => {
-      const v = e.target.value.trim();
-      state.name = v || "Любимая";
-      displayNameEl.textContent = state.name;
-      saveState();
-    });
-
-    helpBtn.addEventListener("click", ()=> {
-      helpOverlay.style.display = "block";
-      helpOverlay.setAttribute("aria-hidden","false");
-    });
-    closeHelp.addEventListener("click", ()=> {
-      helpOverlay.style.display = "none";
-      helpOverlay.setAttribute("aria-hidden","true");
-    });
-
-    helpOverlay.addEventListener("click", e => {
-      if(e.target === helpOverlay) {
-        helpOverlay.style.display="none";
-        helpOverlay.setAttribute("aria-hidden","true");
-      }
-    });
-    overlay.addEventListener("click", e => {
-      if(e.target === overlay){
-        overlay.style.display="none";
-        overlay.setAttribute("aria-hidden","true");
-      }
-    });
-
-    // === Стартовое состояние ===
-    resetGame();
-
-    // === Сохраняем при уходе ===
-    window.addEventListener("beforeunload", saveState);
-  })();
+    restartBtn.onclick = () => renderNode('start');
+    renderNode('start');
   </script>
 </body>
 </html>
