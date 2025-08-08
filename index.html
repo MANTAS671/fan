@@ -3,316 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>История Татьяны и Эдварда</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <title>История Любви и Эдварда</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      min-height: 100vh;
-      background: linear-gradient(120deg, #181824 0%, #23243a 100%);
-      color: #fff;
-      font-family: 'Montserrat', Arial, sans-serif;
       margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      overflow-x: hidden;
-    }
-    .container {
-      background: rgba(34,36,64,0.85);
-      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.45);
-      border-radius: 2rem;
-      padding: 2rem 1.5rem;
-      max-width: 440px;
-      width: 96vw;
-      margin: 1.5rem auto;
-      animation: fadein 1.4s cubic-bezier(.6,0,.4,1);
-    }
-    @keyframes fadein {
-      from { opacity: 0; transform: translateY(50px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .story {
-      font-size: 1.19rem;
-      margin-bottom: 1.3rem;
-      line-height: 1.6;
-      min-height: 76px;
-      transition: all .3s;
-    }
-    .choices {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(#ffccf9, #fff0f5);
+      color: #333;
       display: flex;
       flex-direction: column;
-      gap: 1.1rem;
-      margin-bottom: 0.5rem;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 20px;
     }
-    .choice-btn {
-      background: linear-gradient(90deg, #45b4ff 0%, #6642f5 100%);
-      color: #fff;
-      border: none;
-      padding: 0.86rem 1.2rem;
-      font-size: 1.02rem;
-      border-radius: 1.2rem;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 600;
-      box-shadow: 0 2px 8px 0 rgba(80,110,255,0.15);
-      transition: all .15s;
+    #game {
+      background: white;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 100%;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: fadeIn 1s ease-in-out;
     }
-    .choice-btn:hover, .choice-btn:focus {
-      background: linear-gradient(90deg, #6ad1fc 0%, #7e63fc 100%);
-      box-shadow: 0 6px 16px 0 rgba(80,110,255,0.23);
-      outline: none;
-    }
-    .ending {
-      font-size: 1.18rem;
-      padding: 1.4rem 0 0.6rem 0;
-      color: #aee1ff;
-      font-weight: 600;
-      line-height: 1.7;
+    h1, p {
       text-align: center;
-      min-height: 80px;
     }
-    .restart-btn {
-      margin: 1.1rem auto 0 auto;
-      display: block;
-      background: linear-gradient(90deg, #2ef09a 0%, #55c5f2 100%);
-      color: #222;
-      font-weight: 700;
+    .options {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 15px;
       border: none;
-      padding: 0.9rem 2.4rem;
-      font-size: 1.11rem;
-      border-radius: 1.1rem;
+      border-radius: 10px;
+      background: #ff69b4;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
       cursor: pointer;
-      transition: all .15s;
+      transition: background 0.3s;
     }
-    .restart-btn:hover {
-      background: linear-gradient(90deg, #66fec5 0%, #84daff 100%);
+    button:hover {
+      background: #ff1493;
     }
-    @media (max-width: 500px) {
-      .container { padding: 1.1rem 0.4rem; border-radius: 1.1rem; }
-      .story { font-size: 1rem; min-height: 50px; }
-      .choice-btn { font-size: .93rem; padding: 0.7rem 0.7rem; border-radius: 1rem; }
-      .ending { font-size: 1.02rem; }
+    img.monkey {
+      width: 100px;
+      margin: 10px auto;
+      display: block;
+      animation: swing 1s infinite alternate ease-in-out;
+    }
+    @keyframes swing {
+      from { transform: rotate(-10deg); }
+      to { transform: rotate(10deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="story" id="story"></div>
-    <div class="choices" id="choices"></div>
-    <div class="ending" id="ending"></div>
-    <button class="restart-btn" id="restartBtn" style="display:none;">Попробовать другой вариант</button>
+  <div id="game">
+    <img class="monkey" src="https://i.ibb.co/gmnWrX8/monkey.png" alt="Обезьянка">
+    <h1>Ты — Любовь...</h1>
+    <p>Ты начала общение с парнем по имени Эдвард. Он странный. Он пишет без ошибок. Он кидает мемы с обезьянками. Подозрительно.</p>
+    <div class="options" id="options"></div>
   </div>
+  
   <script>
-    const storyEl = document.getElementById('story');
-    const choicesEl = document.getElementById('choices');
-    const endingEl = document.getElementById('ending');
-    const restartBtn = document.getElementById('restartBtn');
-
-    const storyTree = {
-      start: {
-        text: 'Эдвард впервые пишет тебе: "Привет, Татьяна! У тебя такая добрая улыбка, что аж захотелось познакомиться." Как отреагируешь?',
-        choices: [
-          { text: 'Ответить шуткой: "Улыбаюсь только когда кофе дали!"', next: 'coffeeJoke' },
-          { text: 'Сделать вид, что занята: "Ой, привет! Сейчас не могу говорить..."', next: 'busy' },
-          { text: 'Сразу по-серьёзному: "Спасибо! А ты чем увлекаешься?"', next: 'seriousStart' }
+    const story = [
+      {
+        text: "Он отправил тебе мем с обезьянкой, который явно сам сделал. Что ты ответишь?",
+        options: [
+          "😂 'Это лучший мем, который я видела!'",
+          "🤨 'Хм... у тебя есть работа?'",
+          "🙈 'Я боюсь обезьян...'"
         ]
       },
-      coffeeJoke: {
-        text: 'Эдвард: "Я уже бегу с кофе, как истинный джентльмен!"',
-        choices: [
-          { text: 'Пошутить в ответ: "Тогда бери два, вдруг я захочу ещё!"', next: 'doubleCoffee' },
-          { text: 'Спросить: "А ты вообще умеешь варить кофе?"', next: 'coffeeSkill' }
+      {
+        text: "Он предлагает встретиться в кафе 'У Шимпанзе'. Твои действия?",
+        options: [
+          "🐒 'Обезьяны + кофе = идеальное свидание'",
+          "☕ 'Только если без бананового латте'",
+          "🚪 'Спасибо, но я пас'"
         ]
       },
-      doubleCoffee: {
-        text: 'Эдвард: "Готов даже три! Ради такой девушки всё что угодно."',
-        choices: [
-          { text: 'Поддержать флирт: "Ого, надеюсь без яда!"', next: 'flirt' },
-          { text: 'Перевести на интересы: "Ты всегда такой энергичный?"', next: 'energy' }
+      {
+        text: "В кафе он рассказывает, что изучал философию. И тут он говорит: 'А знаешь, я не совсем обычный... Я вампир.'",
+        options: [
+          "🧛‍♀️ 'Класс, покажи клыки!'",
+          "😱 'Я знала! Ты странный!'",
+          "👄 'Так ты хочешь выпить мою кровь?..'"
         ]
       },
-      coffeeSkill: {
-        text: 'Эдвард: "Умею! Но ты меня можешь научить — вдруг твой способ волшебный."',
-        choices: [
-          { text: 'Улыбнуться: "Учитель из меня так себе, но попробую."', next: 'hobbyTalk' },
-          { text: 'Спросить: "Ты вообще часто готовишь?"', next: 'cooking' }
+      {
+        text: "Он тянется к твоей шее... но внезапно замирает. Смотрит в твои глаза и... отступает.",
+        options: [
+          "❤️ 'Ты не можешь меня укусить?'",
+          "💋 'Поцелуй вместо укуса?'",
+          "🥺 'Это было мило... и странно'"
         ]
       },
-      busy: {
-        text: 'Ты занята, но Эдвард не сдаётся: "Ладно, я подожду, ты мне уже интересна."',
-        choices: [
-          { text: 'Мило: "Окей, отпишу позже!"', next: 'lateTalk' },
-          { text: 'Сразу спросить, зачем пишет: "Ты всем так пишешь?"', next: 'questionIntent' }
+      {
+        text: "Он исчезает в ночи. Утром под дверью ты находишь коробку с мягкой игрушкой — обезьянкой. И записку: \"Ты зацепила даже того, у кого нет сердца. — Э.\"",
+        options: [
+          "😊 'Это была самая странная и романтичная история в моей жизни'",
+          "🦇 'Хочу продолжения!'",
+          "😶 'Ну и ну...'"
         ]
-      },
-      lateTalk: {
-        text: 'Позже ты отвечаешь, Эдвард радуется: "Ура, дождался! Как твой день прошёл?"',
-        choices: [
-          { text: 'Кратко: "Обычный день, ничего особенного."', next: 'hobbyTalk' },
-          { text: 'В деталях: "Была куча дел, но теперь отдыхаю."', next: 'movieNight' }
-        ]
-      },
-      questionIntent: {
-        text: 'Эдвард: "Нет, мне только ты понравилась. Правда!"',
-        choices: [
-          { text: 'Поверить: "Ну ладно, поверю на слово."', next: 'hobbyTalk' },
-          { text: 'Сомневаться: "А почему я?"', next: 'whyYou' }
-        ]
-      },
-      seriousStart: {
-        text: 'Эдвард: "Люблю музыку, книги и философию. А ты?"',
-        choices: [
-          { text: 'Рассказать о своих хобби', next: 'hobbyTalk' },
-          { text: 'Пошутить: "А если я скажу, что люблю спать?"', next: 'sleepJoke' }
-        ]
-      },
-      hobbyTalk: {
-        text: 'Вы обмениваетесь хобби. Оказывается, у вас есть общие интересы!',
-        choices: [
-          { text: 'Спросить про любимую музыку', next: 'musicTalk' },
-          { text: 'Узнать, какой он человек: "Ты экстраверт или интроверт?"', next: 'personality' }
-        ]
-      },
-      sleepJoke: {
-        text: 'Эдвард: "Спать — это святое! Но если я буду рядом, ты не уснёшь..."',
-        choices: [
-          { text: 'Посмеяться: "Ну-ну, проверь!"', next: 'flirt' },
-          { text: 'Ответить серьёзно: "Сомневаюсь!"', next: 'flirt' }
-        ]
-      },
-      musicTalk: {
-        text: 'Эдвард: "Я обожаю пианино и иногда играю на гитаре."',
-        choices: [
-          { text: 'Попросить сыграть при встрече', next: 'musicLive' },
-          { text: 'Спросить: "Скинешь видео?"', next: 'musicVideo' }
-        ]
-      },
-      musicLive: {
-        text: 'Эдвард: "Обещаю сыграть для тебя лично!"',
-        choices: [
-          { text: 'Написать: "Договорились!"', next: 'futurePlans' },
-          { text: 'Пошутить: "Если не облажаешься!"', next: 'futurePlans' }
-        ]
-      },
-      musicVideo: {
-        text: 'Эдвард: "Сначала увидимся, а потом — эксклюзив!"',
-        choices: [
-          { text: 'Согласиться: "Интригуешь!"', next: 'futurePlans' },
-          { text: 'Сказать: "Я жду!"', next: 'futurePlans' }
-        ]
-      },
-      personality: {
-        text: 'Эдвард: "Интроверт, но ради тебя могу стать экстравертом."',
-        choices: [
-          { text: 'Пошутить: "Ну посмотрим, какой ты!"', next: 'futurePlans' },
-          { text: 'Сказать: "Интроверты классные."', next: 'futurePlans' }
-        ]
-      },
-      movieNight: {
-        text: 'Эдвард: "Может, вместе посмотрим какой-нибудь фильм онлайн?"',
-        choices: [
-          { text: 'Согласиться', next: 'futurePlans' },
-          { text: 'Пошутить: "А попкорн кто принесёт?"', next: 'futurePlans' }
-        ]
-      },
-      energy: {
-        text: 'Эдвард: "Ты просто вдохновляешь!"',
-        choices: [
-          { text: 'Пошутить: "Смотри, не перегори!"', next: 'flirt' },
-          { text: 'Сказать: "Спасибо, приятно!"', next: 'flirt' }
-        ]
-      },
-      flirt: {
-        text: 'Переписка становится всё более уютной и весёлой. Эдвард явно настроен на флирт!',
-        choices: [
-          { text: 'Ответить взаимно', next: 'futurePlans' },
-          { text: 'Перевести на дружбу', next: 'friendzone' }
-        ]
-      },
-      cooking: {
-        text: 'Эдвард: "Иногда. Но если вместе — готовить веселее!"',
-        choices: [
-          { text: 'Согласиться: "Вдвоём и правда интереснее."', next: 'futurePlans' },
-          { text: 'Пошутить: "Главное — не сжечь кухню."', next: 'futurePlans' }
-        ]
-      },
-      whyYou: {
-        text: 'Эдвард: "Ты очень искренняя, таких мало!"',
-        choices: [
-          { text: 'Растрогаться: "Спасибо!"', next: 'hobbyTalk' },
-          { text: 'Пошутить: "Ну да, я редкий Pokémon."', next: 'hobbyTalk' }
-        ]
-      },
-      futurePlans: {
-        text: 'Проходит время. Переписка уже на другом уровне. Что дальше?',
-        choices: [
-          { text: 'Намекнуть на встречу', next: 'meeting' },
-          { text: 'Пошутить: "Давай не спешить!"', next: 'slowdown' }
-        ]
-      },
-      meeting: {
-        text: 'Эдвард: "С удовольствием приглашу тебя на кофе! Только без подвохов, обещаю."',
-        choices: [
-          { text: 'Согласиться на встречу', next: 'endingDate' },
-          { text: 'Попросить время на подумать', next: 'endingWait' }
-        ]
-      },
-      slowdown: {
-        text: 'Эдвард: "Ладно, буду ждать хоть сто лет! Но фотку члена всё равно не скину ;)"',
-        choices: [
-          { text: 'Рассмеяться: "Ну, хоть это радует!"', next: 'endingFriend' },
-          { text: 'Сказать: "Вдруг захочу попросить?"', next: 'endingTroll' }
-        ]
-      },
-      friendzone: {
-        text: 'Ты перевела разговор в дружбу. Эдвард: "Я рад, что у меня есть такой друг!"',
-        choices: [
-          { text: 'Дружески ответить', next: 'endingFriend' }
-        ]
-      },
-      endingDate: {
-        text: 'Вы встречаетесь, пьёте кофе, смеётесь, и всё складывается отлично! P.S. Нет, Эдвард не собирается скидывать фотку члена. Это наша шутка :)',
-        choices: []
-      },
-      endingWait: {
-        text: 'Ты берёшь паузу. Эдвард терпеливо ждёт. P.S. Нет, Эдвард не собирается скидывать фотку члена. Не проси! :)',
-        choices: []
-      },
-      endingFriend: {
-        text: 'Вы стали классными друзьями, переписываетесь и прикалываетесь друг над другом. Но фоток, о которых все шутят, не будет. Просто дружба :)',
-        choices: []
-      },
-      endingTroll: {
-        text: 'Эдвард смеётся: "Ну, если только в Музее Современного Искусства..." P.S. Нет, Эдвард не собирается скидывать фотку члена. Ну правда!',
-        choices: []
       }
-    };
+    ];
 
-    let current = 'start';
+    let current = 0;
 
-    function renderNode(nodeName) {
-      const node = storyTree[nodeName];
-      storyEl.textContent = node.text;
-      choicesEl.innerHTML = '';
-      endingEl.textContent = '';
-      if (!node.choices || node.choices.length === 0) {
-        endingEl.textContent = 'Конец истории!';
-        restartBtn.style.display = 'block';
-        return;
-      }
-      node.choices.forEach(choice => {
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.textContent = choice.text;
-        btn.onclick = () => renderNode(choice.next);
-        choicesEl.appendChild(btn);
+    function showStep(step) {
+      const optionsDiv = document.getElementById("options");
+      document.querySelector("p").innerText = story[step].text;
+      optionsDiv.innerHTML = "";
+
+      story[step].options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.innerText = option;
+        btn.onclick = () => {
+          current++;
+          if (current < story.length) {
+            showStep(current);
+          } else {
+            showEnding(option);
+          }
+        };
+        optionsDiv.appendChild(btn);
       });
-      restartBtn.style.display = 'none';
     }
 
-    restartBtn.onclick = () => renderNode('start');
-    renderNode('start');
+    function showEnding(finalChoice) {
+      document.querySelector("p").innerText = `Твой выбор — ${finalChoice}`;
+      document.querySelector("h1").innerText = "Конец истории ❤️";
+      document.getElementById("options").innerHTML = '<button onclick="location.reload()">Пройти ещё раз</button>';
+    }
+
+    showStep(current);
   </script>
 </body>
 </html>
