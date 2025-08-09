@@ -1,410 +1,594 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
-<meta name="theme-color" content="#0b0f14" />
-<title>Next Gen 1.3 — PC Upgrade Simulator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ты точно не Алексей? — Next Gen 1.4</title>
 <style>
-  :root{
-    --bg:#070b11; --bg2:#0d131c; --ink:#e8f0ff; --muted:#9db0c9; --acc:#7dffb0; --blue:#60a5fa; --vio:#b794f4; --rose:#fb7185; --amber:#fbbf24;
-    --glass: rgba(255,255,255,.06); --card: rgba(255,255,255,.12); --shadow: 0 18px 56px rgba(0,0,0,.5);
-  }
-  @media (prefers-color-scheme: light){
-    :root{ --bg:#f7f9ff; --bg2:#ffffff; --ink:#0e172a; --muted:#4a5d74; --acc:#22c55e; --blue:#2563eb; --vio:#7c3aed; --rose:#e11d48; --amber:#d97706; --glass: rgba(0,0,0,.05); --card: rgba(0,0,0,.08); --shadow: 0 14px 34px rgba(0,0,0,.16) }
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{ margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial; color:var(--ink); background:radial-gradient(90% 65% at 50% -20%,#112136 0%,transparent 70%), var(--bg); min-height:100dvh; display:grid; place-items:center; padding:10px }
-  .wrap{ width:100%; max-width:980px; background:linear-gradient(180deg,var(--bg2),transparent), var(--glass); border:1px solid var(--card); border-radius:24px; box-shadow:var(--shadow); overflow:hidden; position:relative }
-  header{ padding:12px; text-align:center }
-  h1{ margin:0; font-size:clamp(20px,5.5vw,34px); font-weight:900; letter-spacing:.3px; background:linear-gradient(90deg,#a7f3d0,#93c5fd,#e9d5ff); -webkit-background-clip:text; background-clip:text; color:transparent }
-  .sub{ color:var(--muted); font-size:clamp(12px,3.6vw,16px) }
-
-  .grid{ display:grid; grid-template-columns: 1.15fr .85fr; gap:10px; padding:10px }
-  @media (max-width:860px){ .grid{ grid-template-columns:1fr } }
-
-  .stage{ position:relative; background:linear-gradient(180deg,#0c121a 0%, #0c1828 100%); border:1px solid var(--card); border-radius:16px; overflow:hidden; min-height:62dvh }
-  canvas{ width:100%; height:100%; display:block }
-
-  .side{ display:grid; gap:10px; grid-auto-rows:minmax(0,auto) }
-  .card{ background:var(--glass); border:1px solid var(--card); border-radius:16px; padding:12px }
-  .row{ display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap }
-
-  .hud{ display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px }
-  .pill{ background:var(--glass); border:1px solid var(--card); border-radius:999px; padding:6px 10px; display:flex; align-items:center; gap:8px; box-shadow:0 8px 22px rgba(0,0,0,.2) }
-  .score{ font-weight:900 }
-  .bar{ width:140px; height:10px; background:rgba(255,255,255,.12); border-radius:999px; overflow:hidden; border:1px solid var(--card) }
-  .bar>i{ display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--amber),var(--rose)); transition:width .25s ease }
-
-  /* Controls */
-  .controls{ display:flex; gap:10px; justify-content:center }
-  .btn{ appearance:none; border:0; cursor:pointer; background:linear-gradient(180deg,var(--acc),#38d47a); color:#061008; font-weight:900; border-radius:14px; padding:12px 14px; min-width:120px; box-shadow:0 10px 24px rgba(50,205,50,.24); font-size:16px }
-  .btn.alt{ background:var(--glass); color:var(--ink); border:1px solid var(--card); box-shadow:none }
-  .btn:active{ transform:translateY(1px) scale(.99) }
-
-  /* PC Visual */
-  .rig{ position:relative; height:260px; border-radius:14px; background:linear-gradient(180deg,#0b0f14,#0e131c); border:1px solid var(--card); overflow:hidden }
-  .rig .case{ position:absolute; inset:10px; border-radius:12px; background:linear-gradient(180deg,#0e1621,#111b29); border:1px solid rgba(255,255,255,.08) }
-  .rig .glass{ position:absolute; inset:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.1)); box-shadow:inset 0 0 30px rgba(0,0,0,.4) }
-  .rig .fan{ position:absolute; width:54px; height:54px; border-radius:50%; top:24px; left:24px; background:conic-gradient(from var(--ang,0deg), #7dffb0, #60a5fa, #b794f4, #fbbf24, #fb7185, #7dffb0); filter:saturate(1.2); animation:spin 3s linear infinite; opacity:.2 }
-  .rig.up1 .fan{ opacity:.8 }
-  @keyframes spin{ to{ transform:rotate(360deg) } }
-  .rig .gpu{ position:absolute; right:22px; top:48px; width:160px; height:34px; border-radius:8px; background:linear-gradient(90deg,#1d2735,#141e2a); border:1px solid rgba(255,255,255,.08); box-shadow:inset 0 0 12px rgba(0,0,0,.6); opacity:.15 }
-  .rig.up2 .gpu{ opacity:.95 }
-  .rig .rgb{ position:absolute; bottom:24px; left:22px; right:22px; height:6px; border-radius:6px; background:linear-gradient(90deg,#7dffb0,#60a5fa,#b794f4,#fbbf24,#fb7185); opacity:.15 }
-  .rig.up3 .rgb{ opacity:.95; box-shadow:0 0 16px #7dffb0 }
-  .rig .pipes{ position:absolute; right:34px; top:100px; width:90px; height:70px; border-radius:14px; border:2px solid rgba(140,221,255,.4); opacity:.12 }
-  .rig.up4 .pipes{ opacity:.9; box-shadow:0 0 14px rgba(96,165,250,.35) }
-  .rig .ssd{ position:absolute; left:22px; bottom:56px; width:80px; height:24px; border-radius:6px; background:linear-gradient(90deg,#2b3442,#1b2330); border:1px solid rgba(255,255,255,.08); opacity:.12 }
-  .rig.up5 .ssd{ opacity:.95 }
-  .rig .cpu{ position:absolute; left:24px; top:88px; width:46px; height:46px; border-radius:10px; background:linear-gradient(180deg,#293547,#1b2535); border:1px solid rgba(255,255,255,.08); box-shadow:inset 0 0 10px rgba(0,0,0,.5); opacity:.12 }
-  .rig.up6 .cpu{ opacity:.95 }
-
-  .toast{ position:fixed; top:10px; left:50%; transform:translateX(-50%); background:var(--bg2); border:1px solid var(--card); padding:8px 10px; border-radius:12px; display:none; z-index:50 }
-  .panel{ position:absolute; inset:0; display:grid; place-items:center; background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.38)); backdrop-filter:blur(4px) }
-  .panel .card{ max-width:88%; text-align:center }
-
-  .confetti{ position:fixed; inset:0; pointer-events:none; z-index:80 }
+    /* Стиль оформления в мемно-ироничном "Next Gen 1.4" стиле */
+    body {
+        font-family: sans-serif;
+        background: #222;
+        color: #eee;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+    h1 {
+        margin: 20px 0;
+        font-size: 1.5em;
+    }
+    #score {
+        font-size: 1.2em;
+        margin: 5px;
+    }
+    /* Индикатор кредитных возможностей (иконки кредиток) */
+    #creditIndicator {
+        margin: 5px;
+        font-size: 1.1em;
+    }
+    /* Контейнер долга (прогрессбар рассрочки) */
+    #debtLabel {
+        margin: 5px;
+    }
+    #debtContainer {
+        margin: 5px auto;
+        width: 80%;
+        max-width: 300px;
+        background: #555;
+        border-radius: 5px;
+        overflow: hidden;
+        height: 20px;
+        display: none; /* скрыт, если долга нет */
+    }
+    #debtFill {
+        background: #f00;
+        height: 100%;
+        width: 0%;
+        transition: width 0.5s;
+    }
+    /* Центральный элемент (кликабельный) */
+    #central {
+        display: inline-block;
+        cursor: pointer;
+        margin: 20px;
+        position: relative;
+    }
+    /* Стили для кастомной "видеокарты" (графического объекта для кликов) */
+    #gpuIcon {
+        position: relative;
+        width: 200px;
+        height: 100px;
+        background: #555;
+        border: 4px solid #333;
+        border-radius: 10px;
+        margin: 0 auto;
+        transition: transform 0.1s;
+    }
+    /* Стили для состояний видеокарты при клике и максимальном апгрейде */
+    #gpuIcon.clicked {
+        transform: scale(1.1);
+        box-shadow: 0 0 10px #0ff;
+    }
+    #gpuIcon.maxed {
+        border-color: #0f0;
+        box-shadow: 0 0 20px #0f0;
+    }
+    /* Вентиляторы на видеокарте */
+    .fan {
+        position: absolute;
+        top: 30px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #111;
+        border: 4px solid #333;
+    }
+    .fan::after {
+        content: "";
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        width: 16px;
+        height: 16px;
+        background: #666;
+        border-radius: 50%;
+    }
+    .fan1 { left: 20px; }
+    .fan2 { left: 80px; }
+    .fan3 { left: 140px; }
+    /* "Золотой" разъём (PCI-Express connector) */
+    .connector {
+        position: absolute;
+        left: 15px;
+        bottom: -5px;
+        width: 50px;
+        height: 10px;
+        background: linear-gradient(to right, #DAA520, #FFD700);
+    }
+    /* Метка названия видеокарты на карте */
+    #gpuLabel {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        font-size: 10px;
+        color: #fff;
+        text-shadow: 0 0 2px #000;
+        white-space: nowrap;
+    }
+    /* Стили для вылетающих частиц при клике (+FPS) */
+    .particle {
+        position: absolute;
+        font-weight: bold;
+        color: #0f0;
+        pointer-events: none;
+        text-shadow: 0 0 5px #0f0;
+        animation: floatUp 1s ease-out forwards;
+    }
+    @keyframes floatUp {
+        0% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+    }
+    /* Кнопки апгрейдов */
+    #upgrades {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 10px;
+    }
+    .upgrade-btn {
+        background: #444;
+        color: #eee;
+        border: 2px solid #666;
+        padding: 8px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        min-width: 100px;
+        font-size: 0.9em;
+    }
+    .upgrade-btn:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+    .upgrade-btn:hover:enabled {
+        background: #555;
+    }
+    /* Панель состояния сборки (список текущих комплектующих) */
+    #buildStatus {
+        width: 90%;
+        max-width: 400px;
+        margin: 20px auto;
+        text-align: left;
+        background: #333;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    #buildStatus h3 {
+        text-align: center;
+        margin: 5px 0 10px;
+        font-size: 1.1em;
+    }
+    .part {
+        margin: 4px 0;
+    }
+    /* Блок сообщений (для всплывающих шуток/уведомлений) */
+    #messageBox {
+        margin: 10px;
+        min-height: 20px;
+        font-size: 0.95em;
+        color: #ff0;
+    }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Next Gen 1.3 — PC Upgrade Simulator</h1>
-      <div class="sub">Лови годные комплектующие — строй зверя. Избегай кредиток и хлама. Без звука и вибраций.</div>
-    </header>
 
-    <div class="grid">
-      <section class="stage">
-        <canvas id="game" width="800" height="520" aria-label="PC Upgrade Simulator"></canvas>
-        <div class="panel" id="menu">
-          <div class="card">
-            <h2 style="margin:0 0 6px">Ты точно не Алексей?</h2>
-            <p style="margin:0 0 10px; color:var(--muted)">Лови апгрейды, избегай соблазнов. Сможешь собрать Next Gen Beast до трёх кредиток?</p>
-            <div class="row">
-              <button class="btn" id="playBtn">Играть</button>
-              <button class="btn alt" id="howBtn">Как играть</button>
-            </div>
-          </div>
-        </div>
-        <div class="panel" id="how" hidden>
-          <div class="card">
-            <h3 style="margin:0 0 8px">Правила</h3>
-            <ul style="text-align:left; margin:0 0 8px; padding-left:18px; line-height:1.4">
-              <li>Двигай ловушку внизу: свайп/перетаскивание или кнопки ◀ ▶.</li>
-              <li>Зелёные — годные апгрейды (GPU/CPU/SSD/RAM/RGB/водянка) — дают очки и апгрейд визуально.</li>
-              <li>Красные — мусор/кредитки — бьют по «долгу». 3 кредитки = проигрыш.</li>
-              <li>Жёлтые — приколы: банан/тостер — минус очки.</li>
-              <li>Собери 6 апгрейдов — победа и конфетти.</li>
-            </ul>
-            <div class="row"><button class="btn" id="okBtn">Понял</button></div>
-          </div>
-        </div>
-        <div class="panel" id="gameOver" hidden>
-          <div class="card">
-            <h2 style="margin:0 0 6px" id="endTitle">Финиш!</h2>
-            <p style="margin:0 6px; color:var(--muted)">Очки: <b id="finalScore">0</b></p>
-            <div class="row">
-              <button class="btn" id="replayBtn">Ещё раз</button>
-              <button class="btn alt" id="menuBtn">Меню</button>
-            </div>
-          </div>
-        </div>
-      </section>
+<h1>Ты точно не Алексей? — Next Gen 1.4</h1>
+<div id="score">FPS: 0</div>
+<div id="creditIndicator">Кредитки: <span id="creditIcons">💳💳💳</span></div>
+<div id="debtLabel" style="display:none;">Долг: <span id="debtAmount">0</span> FPS</div>
+<div id="debtContainer"><div id="debtFill"></div></div>
 
-      <aside class="side">
-        <div class="card">
-          <div class="hud">
-            <div class="pill">Очки: <b class="score" id="score">0</b></div>
-            <div class="pill">Кредитки: <b id="strikes">0/3</b></div>
-            <div class="pill">Долг <div class="bar"><i id="debt"></i></div></div>
-          </div>
-          <div class="controls">
-            <button class="btn alt" id="leftBtn">◀</button>
-            <button class="btn alt" id="rightBtn">▶</button>
-          </div>
-        </div>
-        <div class="card">
-          <h3 style="margin:0 0 8px">Твой билд</h3>
-          <div class="rig" id="rig">
-            <i class="case"></i>
-            <i class="glass"></i>
-            <i class="fan"></i>
-            <i class="gpu"></i>
-            <i class="rgb"></i>
-            <i class="pipes"></i>
-            <i class="ssd"></i>
-            <i class="cpu"></i>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; color:var(--muted); font-size:13px">
-            <span id="tag1">GPU: —</span>
-            <span id="tag2">CPU: —</span>
-            <span id="tag3">SSD: —</span>
-            <span id="tag4">RGB: —</span>
-            <span id="tag5">Водянка: —</span>
-            <span id="tag6">Баланс: —</span>
-          </div>
-        </div>
-      </aside>
+<div id="central">
+    <!-- Центральный кликабельный элемент (видеокарта в виде мемного изображения) -->
+    <div id="gpuIcon">
+        <div class="fan fan1"></div>
+        <div class="fan fan2"></div>
+        <div class="fan fan3"></div>
+        <div class="connector"></div>
+        <div id="gpuLabel"></div>
     </div>
-  </div>
+</div>
 
-  <div class="toast" id="toast"></div>
-  <canvas class="confetti" id="confetti" hidden></canvas>
+<div id="upgrades"></div>
+
+<div id="buildStatus">
+    <h3>Твой билд:</h3>
+    <div id="partsList"></div>
+</div>
+
+<div id="messageBox"></div>
 
 <script>
-// ===== Next Gen 1.3 — PC Upgrade Simulator =====
-// Мобильный дружественный геймплей, без звука/вибраций, плавные анимации.
+/* Логика игры-кликера "Ты точно не Алексей? — Next Gen 1.4" */
+window.addEventListener('load', function() {
+    // Данные об апгрейдах комплектующих
+    const parts = {
+        gpu: {
+            name: "Видеокарта",
+            level: 0,
+            effect: 5, // добавка FPS за уровень
+            cost: [20, 100, 500, 2000, 10000],
+            names: ["Интегрированное видео", "GeForce GTX 480", "GeForce GTX 1080 Ti (БУ)", "RTX 3060", "RTX 4090", "RTX 9090"]
+        },
+        cpu: {
+            name: "Процессор",
+            level: 0,
+            effect: 4,
+            cost: [15, 75, 300, 1500, 6000],
+            names: ["Pentium II 300 MHz", "Intel Pentium 4", "Intel Core i3", "AMD Ryzen 5 3600", "Intel Core i9-13900K", "Квантовый CPU"]
+        },
+        ram: {
+            name: "Оперативная память",
+            level: 0,
+            effect: 3,
+            cost: [10, 50, 250, 1000, 4000],
+            names: ["DDR 512 MB", "DDR2 2 GB", "DDR3 8 GB", "DDR4 16 GB", "DDR5 32 GB", "DDR6 128 GB"]
+        },
+        cooler: {
+            name: "Охлаждение",
+            level: 0,
+            effect: 2,
+            cost: [5, 25, 100, 500, 2000],
+            names: ["Стоковый кулер", "Кулер с базара", "Башенный кулер", "СВО (водяное)", "Жидкий азот", "Крио-заморозка"]
+        },
+        case: {
+            name: "Корпус",
+            level: 0,
+            effect: 1,
+            cost: [3, 15, 60, 300, 1200],
+            names: ["Коробка из-под обуви", "Подержанный корпус", "Обычный корпус", "Игровой корпус с RGB", "Прозрачный корпус", "Золотой корпус"]
+        }
+    };
+    // Генитивные названия для кнопок (кого/чего апгрейдим)
+    const partGenitive = {
+        gpu: "видеокарты",
+        cpu: "процессора",
+        ram: "оперативки",
+        cooler: "кулера",
+        case: "корпуса"
+    };
 
-const cnv = document.getElementById('game');
-const ctx = cnv.getContext('2d');
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas, {passive:true});
+    // Переменные состояния игры
+    let points = 0;               // текущие очки (FPS)
+    let pointsPerClick = 1;       // FPS за один клик (увеличивается апгрейдами)
+    let debt = 0;                 // текущий долг (неоплаченные FPS)
+    let totalDebtIncurred = 0;    // сумма долга, которая должна быть выплачена (для прогрессбара)
+    let creditCount = 0;          // сколько апгрейдов взято в кредит подряд
 
-// UI
-const scoreEl = document.getElementById('score');
-const strikesEl = document.getElementById('strikes');
-const debtBar = document.getElementById('debt');
-const rig = document.getElementById('rig');
-const tag = [null, ...[1,2,3,4,5,6].map(n=>document.getElementById('tag'+n))];
+    // Ссылки на элементы интерфейса
+    const scoreEl = document.getElementById('score');
+    const debtLabelEl = document.getElementById('debtLabel');
+    const debtAmountEl = document.getElementById('debtAmount');
+    const debtFillEl = document.getElementById('debtFill');
+    const creditIconsEl = document.getElementById('creditIcons');
+    const gpuLabelEl = document.getElementById('gpuLabel');
+    const gpuIconEl = document.getElementById('gpuIcon');
+    const upgradesContainer = document.getElementById('upgrades');
+    const partsListEl = document.getElementById('partsList');
+    const messageBoxEl = document.getElementById('messageBox');
 
-const menu = document.getElementById('menu');
-const how = document.getElementById('how');
-const gameOver = document.getElementById('gameOver');
-const endTitle = document.getElementById('endTitle');
-const finalScore = document.getElementById('finalScore');
-const toast = document.getElementById('toast');
-const confetti = document.getElementById('confetti');
-const c2 = confetti.getContext('2d');
-
-const playBtn = document.getElementById('playBtn');
-const howBtn = document.getElementById('howBtn');
-const okBtn = document.getElementById('okBtn');
-const replayBtn = document.getElementById('replayBtn');
-const menuBtn = document.getElementById('menuBtn');
-const leftBtn = document.getElementById('leftBtn');
-const rightBtn = document.getElementById('rightBtn');
-
-function show(el){ el.hidden=false; el.style.display='grid' }
-function hide(el){ el.hidden=true; el.style.display='none' }
-
-howBtn.onclick = ()=>{ hide(menu); show(how) };
-okBtn.onclick = ()=>{ hide(how); show(menu) };
-playBtn.onclick = ()=> start();
-replayBtn.onclick = ()=> start();
-menuBtn.onclick = ()=>{ hide(gameOver); show(menu) };
-
-leftBtn.onpointerdown = ()=> key.left=true; leftBtn.onpointerup = ()=> key.left=false; leftBtn.onpointerleave=()=> key.left=false;
-rightBtn.onpointerdown = ()=> key.right=true; rightBtn.onpointerup = ()=> key.right=false; rightBtn.onpointerleave=()=> key.right=false;
-
-// Игровая логика
-const W = 800, H = 520; // логические размеры
-let player = { x: W/2, y: H-40, w: 110, h: 24, vx:0 };
-let objects = [];
-let score=0, strikes=0, debt=0; // 0..100
-let upgrades = 0; // 0..6
-let running=false, t=0, spawnTimer=0;
-let key = {left:false,right:false};
-
-// Категории предметов
-const GOOD = ['gpu','cpu','ssd','rgb','water','balance'];
-const BAD = ['credit'];
-const FUN = ['banana','toaster','brick'];
-
-// Картинки (смешные мемы на кругляшках)
-const IMG = {
-  gpu: img('https://sfile.chatglm.cn/images-ppt/dc68f2522b8a.jpg'),
-  cpu: img('https://sfile.chatglm.cn/images-ppt/94c6e701f06d.png'),
-  ssd: img('https://sfile.chatglm.cn/images-ppt/72d26cd3c9a2.jpg'),
-  rgb: img('https://sfile.chatglm.cn/images-ppt/d6ba94ccd270.jpg'),
-  water: img('https://sfile.chatglm.cn/images-ppt/4727ee8ef79d.jpeg'),
-  balance: img('https://sfile.chatglm.cn/images-ppt/e459fb381b08.jpg'),
-  credit: img('https://sfile.chatglm.cn/images-ppt/5842861121bb.jpg'),
-  banana: img('https://sfile.chatglm.cn/images-ppt/baf2a18ee76a.jpg'),
-  toaster: img('https://sfile.chatglm.cn/images-ppt/590bcaccd076.jpg'),
-  brick: img('https://sfile.chatglm.cn/images-ppt/cfc3e245b2d7.jpg')
-};
-function img(src){ const im=new Image(); im.decoding='async'; im.loading='lazy'; im.src=src; return im }
-
-// --- Canvas helpers (fix ReferenceError: roundRect is not defined) ---
-function roundRect(ctx, x, y, w, h, r){
-  // If supported, use the native roundRect path; otherwise, build path manually.
-  if (typeof ctx.roundRect === 'function') { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
-  r = Math.max(0, Math.min(r, w/2, h/2));
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.arcTo(x + w, y, x + w, y + r, r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-  ctx.lineTo(x + r, y + h);
-  ctx.arcTo(x, y + h, x, y + h - r, r);
-  ctx.lineTo(x, y + r);
-  ctx.arcTo(x, y, x + r, y, r);
-}
-
-// Touch/drag управление
-let dragging=false, dragOff=0;
-cnv.addEventListener('pointerdown',e=>{ dragging=true; dragOff = e.clientX - cnv.getBoundingClientRect().left - player.x; });
-cnv.addEventListener('pointermove',e=>{ if(!dragging) return; const rect=cnv.getBoundingClientRect(); player.x = clamp(e.clientX - rect.left - dragOff, player.w/2, W-player.w/2) });
-cnv.addEventListener('pointerup',()=> dragging=false);
-cnv.addEventListener('pointercancel',()=> dragging=false);
-
-window.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft') key.left=true; if(e.key==='ArrowRight') key.right=true; });
-window.addEventListener('keyup',e=>{ if(e.key==='ArrowLeft') key.left=false; if(e.key==='ArrowRight') key.right=false; });
-
-function start(){ hide(menu); hide(how); hide(gameOver); reset(); running=true; requestAnimationFrame(loop) }
-function reset(){ player.x=W/2; player.vx=0; score=0; strikes=0; debt=0; upgrades=0; objects.length=0; t=0; spawnTimer=0; rig.className='rig';
-  for(let i=1;i<=6;i++){ tag[i].textContent = (['GPU','CPU','SSD','RGB','Водянка','Баланс'][i-1])+': —' }
-  scoreEl.textContent='0'; strikesEl.textContent='0/3'; debtBar.style.width='0%'; toastMsg('Собери 6 апгрейдов!')
-}
-
-function loop(){ if(!running) return; t++; const dt=1; // кадровая логика
-  // фон сцены
-  ctx.clearRect(0,0,W,H);
-  drawBackground();
-
-  // управление
-  const accel = 0.9; const maxV = 9;
-  if(key.left) player.vx -= accel; if(key.right) player.vx += accel; player.vx *= 0.92; player.vx = clamp(player.vx, -maxV, maxV);
-  player.x = clamp(player.x + player.vx, player.w/2, W - player.w/2);
-
-  // спавн предметов
-  spawnTimer -= 1; if(spawnTimer<=0){ spawn(); spawnTimer = 40 + Math.max(0, 70 - upgrades*8) }
-
-  // апдейт предметов
-  for(let i=objects.length-1;i>=0;i--){ const o=objects[i]; o.y += o.vy; o.rot += o.vr;
-    drawItem(o);
-    // столкновение с ловушкой
-    if(collide(o, player)){
-      applyItem(o.type); objects.splice(i,1); continue;
+    // Функция сохранения состояния в localStorage
+    function saveState() {
+        const state = {
+            points: points,
+            debt: debt,
+            totalDebtIncurred: totalDebtIncurred,
+            creditCount: creditCount,
+            partsLevels: {}
+        };
+        for (let key in parts) {
+            state.partsLevels[key] = parts[key].level;
+        }
+        localStorage.setItem('nextgen14_save', JSON.stringify(state));
     }
-    if(o.y>H+60) objects.splice(i,1);
-  }
 
-  // игрок (ловушка)
-  drawCatcher();
+    // Функция загрузки состояния из localStorage
+    function loadState() {
+        const saved = localStorage.getItem('nextgen14_save');
+        if (!saved) return;
+        try {
+            const state = JSON.parse(saved);
+            if (state && typeof state === 'object') {
+                if (typeof state.points === 'number') points = state.points;
+                if (typeof state.debt === 'number') debt = state.debt;
+                if (typeof state.totalDebtIncurred === 'number') totalDebtIncurred = state.totalDebtIncurred;
+                if (typeof state.creditCount === 'number') creditCount = state.creditCount;
+                if (state.partsLevels) {
+                    for (let key in state.partsLevels) {
+                        if (parts[key]) {
+                            parts[key].level = state.partsLevels[key];
+                        }
+                    }
+                }
+            }
+        } catch(e) {
+            console.error("Ошибка загрузки сохранения:", e);
+        }
+    }
 
-  // прогресс поражения
-  debt = clamp(debt + (strikes*0.02), 0, 100); debtBar.style.width = debt.toFixed(1)+'%';
+    // Функция обновления отображения очков FPS
+    function updateScoreDisplay() {
+        scoreEl.textContent = "FPS: " + Math.floor(points);
+    }
 
-  if(strikes>=3){ finish(false); return }
-  if(upgrades>=6){ finish(true); return }
+    // Функция обновления прогрессбара долга
+    function updateDebtDisplay() {
+        if (debt > 0) {
+            debtLabelEl.style.display = "block";
+            debtAmountEl.textContent = debt;
+            const fraction = totalDebtIncurred > 0 ? ( (totalDebtIncurred - debt) / totalDebtIncurred ) : 1;
+            debtFillEl.style.width = (fraction * 100) + "%";
+        } else {
+            debtLabelEl.style.display = "none";
+            debtFillEl.style.width = "0%";
+        }
+    }
 
-  requestAnimationFrame(loop);
-}
+    // Функция обновления отображения кредитных карт (лимита рассрочки)
+    function updateCreditDisplay() {
+        const creditLeft = 3 - creditCount;
+        if (creditLeft <= 0) {
+            creditIconsEl.textContent = "❌";
+        } else {
+            creditIconsEl.textContent = "💳".repeat(creditLeft);
+        }
+    }
 
-function drawBackground(){
-  // дорожки параллакса
-  ctx.save();
-  const grd = ctx.createLinearGradient(0,0,0,H);
-  grd.addColorStop(0,'#0c121a'); grd.addColorStop(1,'#0c1828');
-  ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.setLineDash([12,14]); ctx.lineWidth=2;
-  const lanes=5; for(let k=1;k<lanes;k++){ const x = (W/lanes)*k; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke() }
-  ctx.restore();
-}
+    // Функция пересчета FPS за клик на основе уровней апгрейдов
+    function recalcPointsPerClick() {
+        let base = 1;
+        let bonus = 0;
+        for (let key in parts) {
+            bonus += parts[key].level * parts[key].effect;
+        }
+        pointsPerClick = base + bonus;
+    }
 
-function drawCatcher(){
-  const {x,y,w,h} = player; ctx.save();
-  // база (rounded rect path is now defined)
-  roundRect(ctx, x-w/2, y-h/2, w, h, 8); ctx.fillStyle='rgba(125,255,176,.18)'; ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle='rgba(125,255,176,.6)'; ctx.stroke();
-  // подсветка
-  ctx.beginPath(); ctx.arc(x, y-h/2, 12, 0, Math.PI*2); ctx.fillStyle='rgba(96,165,250,.22)'; ctx.fill();
-  ctx.restore();
-}
+    // Функция отображения всплывающего сообщения (с скрытием через несколько секунд)
+    let messageTimeout = null;
+    function showMessage(text) {
+        messageBoxEl.textContent = text;
+        messageBoxEl.style.opacity = "1";
+        if (messageTimeout) {
+            clearTimeout(messageTimeout);
+        }
+        // Скрыть сообщение через 3 секунды
+        messageTimeout = setTimeout(() => {
+            messageBoxEl.textContent = "";
+        }, 3000);
+    }
 
-function drawItem(o){
-  const s = o.size; ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(o.rot);
-  // круглая рамка
-  ctx.beginPath(); ctx.arc(0, 0, s/2+3, 0, Math.PI*2); ctx.strokeStyle = (GOOD.includes(o.type)? '#7dffb0' : BAD.includes(o.type)? '#fb7185' : '#fbbf24'); ctx.lineWidth=3; ctx.stroke();
-  ctx.beginPath(); ctx.arc(0,0, s/2, 0, Math.PI*2); ctx.clip();
-  const im = IMG[o.type]; if(im && im.complete) ctx.drawImage(im, -s/2, -s/2, s, s); else { ctx.fillStyle='#222'; ctx.fillRect(-s/2,-s/2,s,s) }
-  ctx.restore();
-}
+    // Функция обновления панели "Твой билд"
+    function updateBuildStatus() {
+        partsListEl.innerHTML = ""; // очистить список
+        for (let key in parts) {
+            const part = parts[key];
+            const partDiv = document.createElement('div');
+            partDiv.className = "part";
+            const displayName = part.name;
+            const currentLevel = part.level;
+            const currentName = part.names[currentLevel];
+            // Отображаем название компонента и текущее состояние
+            let text = displayName + ": " + currentName;
+            if (currentLevel >= part.names.length - 1) {
+                text += " (MAX)";
+            } else {
+                text += " (ур. " + currentLevel + ")";
+            }
+            partDiv.textContent = text;
+            partsListEl.appendChild(partDiv);
+        }
+    }
 
-function spawn(){
-  const roll = Math.random(); let type;
-  if(roll<0.55) type = GOOD[(Math.random()*GOOD.length)|0];
-  else if(roll<0.8) type = FUN[(Math.random()*FUN.length)|0];
-  else type = BAD[0];
-  const x = 30 + Math.random()*(W-60); const y = -40; const vy = 2.4 + Math.random()*2.2 + upgrades*0.15; const size = 60 + Math.random()*20; const rot = 0; const vr = (Math.random()-.5)*0.06;
-  objects.push({x,y,vy,size,rot,vr,type});
-}
+    // Функция обновления текста на кнопке апгрейда (стоимость или статус)
+    function updateUpgradeButton(partKey) {
+        const part = parts[partKey];
+        const button = document.getElementById("btn-" + partKey);
+        if (!button) return;
+        if (part.level >= part.names.length - 1) {
+            // Уровень максимальный - отключить кнопку
+            button.textContent = "MAX";
+            button.disabled = true;
+        } else {
+            const cost = part.cost[part.level];
+            button.textContent = "Апгрейд " + partGenitive[partKey] + " (" + cost + " FPS)";
+            // Кнопка активна, если хватает очков или можно в кредит
+            button.disabled = false;
+        }
+    }
 
-function applyItem(type){
-  if(GOOD.includes(type)){
-    score += 120; upgrades = Math.min(6, upgrades+1); toastMsg(goodLine(type)); updateRig();
-    scoreEl.textContent = String(score);
-  } else if(type==='credit'){
-    strikes++; strikesEl.textContent = `${strikes}/3`; debt = clamp(debt+18,0,100); toastMsg('Кредитка: ай-ай');
-  } else {
-    score = Math.max(0, score-60); toastMsg('Мда… Это не апгрейд'); scoreEl.textContent = String(score);
-  }
-}
+    // Инициализация кнопок апгрейдов
+    for (let key in parts) {
+        const part = parts[key];
+        const btn = document.createElement('button');
+        btn.className = "upgrade-btn";
+        btn.id = "btn-" + key;
+        upgradesContainer.appendChild(btn);
+        // Обработчик нажатия на кнопку апгрейда компонента
+        btn.addEventListener('click', function() {
+            // Проверка: не превышен ли лимит кредитов, если очков не хватает
+            if (points < part.cost[part.level]) {
+                // не хватает очков для покупки
+                if (part.level >= part.names.length - 1) {
+                    return; // на всякий случай, если уже макс
+                }
+                // Попытка купить в кредит
+                if (creditCount >= 3) {
+                    // превышен лимит рассрочки
+                    showMessage("Лимит рассрочки исчерпан! Выплатите долг, чтобы взять новый.");
+                    return;
+                }
+            }
+            // Выполнение покупки апгрейда
+            const cost = part.cost[part.level];
+            let usedCredit = false;
+            if (points >= cost) {
+                // достаточно очков - тратим их
+                points -= cost;
+            } else {
+                // покупаем в кредит
+                usedCredit = true;
+                creditCount++;
+                // сколько очков не хватает:
+                const needed = cost - points;
+                points = 0;
+                debt += needed;
+                if (debt > 0 && totalDebtIncurred === 0) {
+                    // если до этого долга не было, устанавливаем новую сумму долга
+                    totalDebtIncurred = debt;
+                } else if (debt > 0) {
+                    // увеличиваем общий долг на добавочную сумму
+                    totalDebtIncurred += needed;
+                }
+                showMessage("Куплено в рассрочку на " + needed + " FPS!");
+            }
+            // Повышаем уровень компонента
+            part.level++;
+            // Обновляем FPS за клик после апгрейда
+            recalcPointsPerClick();
+            // Обновляем отображение названия на видеокарте, если это GPU
+            if (key === 'gpu') {
+                gpuLabelEl.textContent = part.names[part.level];
+                // Если достигли максимального уровня видеокарты, добавляем эффект
+                if (part.level >= part.names.length - 1) {
+                    gpuIconEl.classList.add('maxed');
+                }
+            }
+            // Обновляем интерфейс
+            updateScoreDisplay();
+            updateDebtDisplay();
+            updateCreditDisplay();
+            updateBuildStatus();
+            updateUpgradeButton(key);
+            // Сообщение о проведенном апгрейде (шутка)
+            let joke = "";
+            switch(key) {
+                case 'gpu':
+                    joke = "Теперь у вас " + part.names[part.level] + "! Кадры летят вверх.";
+                    break;
+                case 'cpu':
+                    joke = part.names[part.level] + " установлен. Можно разгонять!";
+                    break;
+                case 'ram':
+                    joke = "Добавлено: " + part.names[part.level] + ". Хватит, чтобы открыть пару вкладок.";
+                    break;
+                case 'cooler':
+                    joke = "Охлаждение улучшено: " + part.names[part.level] + ". Шум уменьшился.";
+                    break;
+                case 'case':
+                    joke = "Новый корпус: " + part.names[part.level] + "! Теперь выглядит красиво.";
+                    break;
+            }
+            showMessage(joke);
+            // Сохранение прогресса
+            saveState();
+        });
+    }
 
-function updateRig(){
-  // визуальные стадии апгрейда
-  rig.className = 'rig ' + ['','up1','up2','up3','up4','up5','up6'][upgrades];
-  const names = {gpu:'GPU',cpu:'CPU',ssd:'SSD',rgb:'RGB',water:'Водянка',balance:'Баланс'};
-  // отметим теги последовательно
-  const map = [null,'gpu','cpu','ssd','rgb','water','balance'];
-  for(let n=1;n<=6;n++){
-    if(n<=upgrades) tag[n].textContent = `${names[map[n]]}: ✓`;
-  }
-}
+    // Обработчик клика/тапа по центральной иконке (видеокарта)
+    const centralEl = document.getElementById('central');
+    function handleCentralClick(event) {
+        // Координаты клика (учет тач-устройств)
+        let clientX = event.clientX;
+        let clientY = event.clientY;
+        if (event.touches && event.touches.length > 0) {
+            clientX = event.touches[0].clientX;
+            clientY = event.touches[0].clientY;
+        }
+        // Добавляем очки (FPS)
+        points += pointsPerClick;
+        // Если есть долг, погашаем его в первую очередь
+        if (debt > 0) {
+            if (points >= debt) {
+                // хватает набранных очков, чтобы закрыть долг
+                points -= debt;
+                debt = 0;
+                // долг выплачен, сбрасываем счетчик кредитов
+                creditCount = 0;
+                totalDebtIncurred = 0;
+                showMessage("Долг выплачен! Можно брать новые апгрейды в кредит.");
+            } else {
+                // не весь долг закрыт, отнимаем все очки в счет долга
+                debt -= points;
+                points = 0;
+            }
+        }
+        // Обновляем счетчики и интерфейс
+        updateScoreDisplay();
+        updateDebtDisplay();
+        updateCreditDisplay();
+        // Анимация: вылетающая частица с количеством полученного FPS
+        const particle = document.createElement('span');
+        particle.className = "particle";
+        particle.textContent = "+" + pointsPerClick;
+        // Размещаем частицу в точке клика
+        const rect = centralEl.getBoundingClientRect();
+        particle.style.left = (clientX - rect.left) + "px";
+        particle.style.top = (clientY - rect.top) + "px";
+        centralEl.appendChild(particle);
+        // Удаляем элемент частицы после анимации
+        setTimeout(() => {
+            particle.remove();
+        }, 1000);
+        // Добавляем кратковременный эффект на саму видеокарту (масштаб/свечение)
+        gpuIconEl.classList.add('clicked');
+        setTimeout(() => {
+            gpuIconEl.classList.remove('clicked');
+        }, 100);
+        // Сохранение прогресса (очков и долга)
+        saveState();
+    }
+    // Назначаем обработчики клика/тача на центральный элемент
+    centralEl.addEventListener('click', handleCentralClick);
+    centralEl.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        handleCentralClick(e);
+    });
 
-function finish(win){
-  running=false; finalScore.textContent = String(score); endTitle.textContent = win? 'Next Gen Beast — собран!' : 'Алексей в долгах…';
-  show(gameOver); if(win) confettiShow();
-}
+    // Инициализация состояния интерфейса после загрузки/сброса
+    function initUI() {
+        // Устанавливаем метку текущей видеокарты на центральной карте
+        gpuLabelEl.textContent = parts.gpu.names[parts.gpu.level];
+        // Если видеокарта была макс-уровня, включаем свечение
+        if (parts.gpu.level >= parts.gpu.names.length - 1) {
+            gpuIconEl.classList.add('maxed');
+        }
+        // Обновляем все элементы интерфейса
+        updateScoreDisplay();
+        updateDebtDisplay();
+        updateCreditDisplay();
+        updateBuildStatus();
+        // Обновляем текст и состояние всех кнопок апгрейдов
+        for (let key in parts) {
+            updateUpgradeButton(key);
+        }
+    }
 
-function collide(o, p){
-  // AABB vs circle (приближённо)
-  const rx = clamp(o.x, p.x-p.w/2, p.x+p.w/2); const ry = clamp(o.y, p.y-p.h/2, p.y+p.h/2);
-  const dx = o.x - rx; const dy = o.y - ry; return (dx*dx + dy*dy) < (o.size*0.5)*(o.size*0.5);
-}
-
-function toastMsg(text,ms=1100){ toast.textContent=text; toast.style.display='block'; clearTimeout(toast._t); toast._t=setTimeout(()=>toast.style.display='none', ms) }
-function goodLine(type){
-  switch(type){
-    case 'gpu': return 'Годно! GPU в слоте';
-    case 'cpu': return 'Проц сел как родной';
-    case 'ssd': return 'SSD прилетел — загрузка бодрее';
-    case 'rgb': return 'RGB как характер — светит';
-    case 'water': return 'Водянка: холодно, тихо, красиво';
-    case 'balance': return 'Баланс — лучший буст';
-    default: return 'Апгрейд принят';
-  }
-}
-
-function confettiShow(){ confetti.width = innerWidth; confetti.height = innerHeight; confetti.hidden=false; c2.clearRect(0,0,confetti.width,confetti.height);
-  const pieces=[]; const colors=['#7dffb0','#60a5fa','#b794f4','#fbbf24','#fb7185'];
-  for(let k=0;k<150;k++) pieces.push({x:Math.random()*confetti.width, y:-10-Math.random()*200, vy: 2+Math.random()*4, vx: -1+Math.random()*2, w:6+Math.random()*6, h:10+Math.random()*10, c: colors[k%colors.length], r: Math.random()*6});
-  let t=0; const tick=()=>{ c2.clearRect(0,0,confetti.width,confetti.height); t+=1/60; for(const p of pieces){ p.x+=p.vx; p.y+=p.vy; p.r+=0.08; c2.save(); c2.translate(p.x,p.y); c2.rotate(p.r); c2.fillStyle=p.c; c2.fillRect(-p.w/2,-p.h/2,p.w,p.h); c2.restore() } if(t<2.6) requestAnimationFrame(tick); else confetti.hidden=true };
-  requestAnimationFrame(tick);
-}
-
-function clamp(v,min,max){ return Math.max(min, Math.min(max, v)) }
-
-function resizeCanvas(){ const rect = cnv.getBoundingClientRect(); const DPR = Math.max(1, Math.min(3, devicePixelRatio||1)); cnv.width = Math.floor(rect.width*DPR); cnv.height = Math.floor(rect.height*DPR); ctx.setTransform(DPR,0,0,DPR,0,0) }
-
-// ===== Basic tests (added) =====
-(function selfTest(){
-  try {
-    // Test roundRect path creation
-    const tc=document.createElement('canvas'); tc.width=100; tc.height=60; const tctx=tc.getContext('2d');
-    roundRect(tctx,10,10,80,30,8); tctx.fillStyle='#000'; tctx.fill();
-    console.log('[TEST] roundRect: OK');
-  } catch(e){ console.error('[TEST] roundRect FAILED', e); }
-
-  try {
-    // Test collide positive case
-    const p={x:100,y:100,w:60,h:20}; const o={x:100,y:100,size:40};
-    if(!collide(o,p)) console.warn('[TEST] collide: unexpected false for overlap'); else console.log('[TEST] collide: OK');
-  } catch(e){ console.error('[TEST] collide FAILED', e); }
-})();
+    // Загрузка сохраненного состояния, если есть
+    loadState();
+    // Пересчет FPS за клик на основе загруженных апгрейдов
+    recalcPointsPerClick();
+    // Инициализация интерфейса с учетом загруженного состояния
+    initUI();
+});
 </script>
+
 </body>
 </html>
