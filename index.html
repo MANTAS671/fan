@@ -1,163 +1,231 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Новогодняя семейная викторина</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Новогодняя викторина — Зимние чудеса</title>
 
 <style>
-:root{
---bg:#0b0f1a;
---card:#141a2e;
---accent:#d4af37;
---text:#eaeaf0;
---soft:#9aa4c7;
---glow:rgba(212,175,55,.35);
+/* =========================
+   ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+========================= */
+:root {
+  --bg-main: #0b1c2d;
+  --bg-card: rgba(255, 255, 255, 0.12);
+  --text-main: #ffffff;
+  --accent-red: #c62828;
+  --accent-gold: #f5c76a;
+  --accent-green: #2e7d32;
+  --accent-blue: #1976d2;
 }
 
-*{
-box-sizing:border-box;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+/* =========================
+   СБРОС И БАЗА
+========================= */
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-body{
-margin:0;
-min-height:100vh;
-overflow:hidden;
-background:radial-gradient(circle at top,#1b2350,var(--bg));
-color:var(--text);
-display:flex;
-justify-content:center;
-align-items:center;
-padding:14px;
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #163a5f, var(--bg-main));
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 16px;
 }
 
-/* СНЕГ */
-.snow{
-position:fixed;
-inset:0;
-pointer-events:none;
-z-index:1;
-}
-.snow span{
-position:absolute;
-top:-10px;
-width:6px;
-height:6px;
-border-radius:50%;
-background:rgba(255,255,255,.85);
-animation:fall linear infinite;
-}
-@keyframes fall{
-0%{transform:translateY(0);opacity:0}
-10%{opacity:1}
-100%{transform:translateY(110vh);opacity:.2}
+/* =========================
+   СНЕГ (CSS + JS)
+========================= */
+.snow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* КАРТОЧКА */
-.card{
-z-index:2;
-max-width:620px;
-width:100%;
-background:linear-gradient(180deg,#1a2040,var(--card));
-border-radius:18px;
-padding:28px;
-box-shadow:0 0 40px rgba(0,0,0,.55);
-transition:transform .4s, box-shadow .4s;
+.snow span {
+  position: absolute;
+  top: -10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  animation: snow-fall linear infinite;
 }
 
-.card.glow{
-box-shadow:0 0 55px var(--glow);
+@keyframes snow-fall {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(110vh); opacity: 0.2; }
 }
 
-h1{
-text-align:center;
-margin-bottom:6px;
-font-weight:600;
+/* =========================
+   ОСНОВНАЯ КАРТОЧКА
+========================= */
+.quiz-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 720px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.18),
+    var(--bg-card)
+  );
+  border-radius: 20px;
+  padding: 28px 26px 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  animation: fadeUp 0.8s ease;
 }
 
-.subtitle{
-text-align:center;
-color:var(--soft);
-margin-bottom:22px;
-font-size:15px;
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.question{
-font-size:18px;
-margin-bottom:20px;
-animation:fadeInUp .5s ease;
+h1 {
+  text-align: center;
+  margin: 0 0 8px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
 }
 
-.answers button{
-width:100%;
-margin-bottom:12px;
-padding:14px 16px;
-border-radius:12px;
-border:1px solid #2a335f;
-background:#1c2348;
-color:var(--text);
-font-size:15px;
-cursor:pointer;
-transition:.25s;
+.subtitle {
+  text-align: center;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 22px;
+  font-size: 15px;
 }
 
-.answers button:hover{
-background:#252e66;
+/* =========================
+   ВОПРОСЫ И ОТВЕТЫ
+========================= */
+.question {
+  font-size: 20px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.5s ease;
 }
 
-.answers button:active{
-transform:scale(.97);
+.answers {
+  display: grid;
+  gap: 12px;
 }
 
-.comment{
-margin-top:10px;
-font-size:13px;
-color:var(--soft);
-font-style:italic;
-opacity:0;
-animation:fadeIn .6s forwards;
+.answer-btn {
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 14px;
+  color: var(--text-main);
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 
-.progress{
-font-size:13px;
-color:var(--soft);
-text-align:right;
-margin-top:12px;
+.answer-btn:hover {
+  background: rgba(255,255,255,0.28);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.35);
 }
 
-.final{
-text-align:center;
-line-height:1.65;
-animation:fadeInUp .8s ease;
+.answer-btn:active {
+  transform: scale(0.97);
 }
 
-.final h2{
-color:var(--accent);
-margin-bottom:18px;
+.answer-btn.correct {
+  background: rgba(46, 125, 50, 0.6);
+  border-color: rgba(46, 125, 50, 0.9);
 }
 
-.signature{
-margin-top:26px;
-font-style:italic;
-color:var(--soft);
+.answer-btn.wrong {
+  background: rgba(198, 40, 40, 0.55);
+  border-color: rgba(198, 40, 40, 0.85);
 }
 
-/* АНИМАЦИИ */
-@keyframes fadeIn{
-from{opacity:0}
-to{opacity:1}
+/* =========================
+   ОБРАТНАЯ СВЯЗЬ
+========================= */
+.feedback {
+  margin-top: 14px;
+  font-size: 14px;
+  opacity: 0;
+  animation: fadeIn 0.4s forwards;
 }
-@keyframes fadeInUp{
-from{opacity:0;transform:translateY(12px)}
-to{opacity:1;transform:translateY(0)}
+
+.feedback.correct {
+  color: #b9f6ca;
 }
-@keyframes shake{
-0%{transform:translateX(0)}
-25%{transform:translateX(-3px)}
-50%{transform:translateX(3px)}
-75%{transform:translateX(-2px)}
-100%{transform:translateX(0)}
+
+.feedback.wrong {
+  color: #ff8a80;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* =========================
+   ПРОГРЕСС
+========================= */
+.progress {
+  margin-top: 16px;
+  font-size: 13px;
+  text-align: right;
+  opacity: 0.8;
+}
+
+/* =========================
+   РЕЗУЛЬТАТ
+========================= */
+.result {
+  text-align: center;
+  animation: fadeUp 0.6s ease;
+}
+
+.result h2 {
+  margin-bottom: 16px;
+  color: var(--accent-gold);
+}
+
+.result p {
+  line-height: 1.6;
+}
+
+.restart-btn {
+  margin-top: 22px;
+  padding: 14px 22px;
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent-red), var(--accent-gold));
+  color: #1b1b1b;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.25s ease;
+}
+
+.restart-btn:hover {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.restart-btn:active {
+  transform: scale(0.96);
+}
+
+/* =========================
+   АДАПТИВНОСТЬ
+========================= */
+@media (max-width: 480px) {
+  .question {
+    font-size: 18px;
+  }
 }
 </style>
 </head>
@@ -166,133 +234,162 @@ to{opacity:1;transform:translateY(0)}
 
 <div class="snow" id="snow"></div>
 
-<div class="card" id="card">
-<h1>Семейная викторина</h1>
-<div class="subtitle">Новый год. Свои люди. Немного иронии.</div>
-<div id="content"></div>
+<div class="quiz-container">
+  <h1>Новогодняя викторина</h1>
+  <div class="subtitle">Зимние чудеса, традиции и атмосфера праздника</div>
+  <div id="quiz"></div>
 </div>
 
 <script>
-// СНЕГ
-const snow=document.getElementById("snow");
-for(let i=0;i<42;i++){
-const s=document.createElement("span");
-s.style.left=Math.random()*100+"vw";
-s.style.animationDuration=6+Math.random()*8+"s";
-s.style.transform=`scale(${.5+Math.random()})`;
-snow.appendChild(s);
+/* =========================
+   СНЕГ
+========================= */
+const snowContainer = document.getElementById("snow");
+for (let i = 0; i < 50; i++) {
+  const flake = document.createElement("span");
+  flake.style.left = Math.random() * 100 + "vw";
+  flake.style.animationDuration = 5 + Math.random() * 8 + "s";
+  flake.style.transform = `scale(${0.5 + Math.random()})`;
+  snowContainer.appendChild(flake);
 }
 
-// СЧЁТ
-let score={phil:0,fun:0,fam:0,real:0};
-
-const questions=[
-{
-q:"Когда вся семья собирается вместе, ты в первую очередь…",
-a:[
-{t:"Замечаешь, как каждый изменился",k:"phil",c:"Ты всегда смотришь чуть глубже момента."},
-{t:"Отмечаешь абсурд ситуации",k:"fun",c:"Юмор — твой способ адаптации."},
-{t:"Радуешься, что все рядом",k:"fam",c:"Это читается без слов."},
-{t:"Думаешь, как всё организовано",k:"real",c:"Кто-то же должен."}
-]
-},
-{
-q:"Если за столом повисает пауза?",
-a:[
-{t:"Мне в ней комфортно",k:"phil",c:"Тишина тебя не пугает."},
-{t:"Заполняю её шуткой",k:"fun",c:"Иногда это спасает вечер."},
-{t:"Смотрю, кому нужно внимание",k:"fam",c:"Ты чувствуешь людей."},
-{t:"Перехожу к следующей теме",k:"real",c:"Прагматично."}
-]
-},
-{
-q:"Твоё отношение к семейным разговорам?",
-a:[
-{t:"В них всегда больше, чем кажется",k:"phil",c:"Ты это улавливаешь."},
-{t:"Лучшие мемы рождаются тут",k:"fun",c:"И ты это знаешь."},
-{t:"Это то, что держит вместе",k:"fam",c:"Фундамент."},
-{t:"Иногда утомляют",k:"real",c:"Честно."}
-]
-},
-{
-q:"Если кто-то слегка перегнул?",
-a:[
-{t:"Сделаю вид, что не заметил",k:"phil",c:"Иногда это мудрее реакции."},
-{t:"Сведу всё в иронию",k:"fun",c:"Опасно, но эффективно."},
-{t:"Попробую сгладить",k:"fam",c:"Миротворец внутри тебя жив."},
-{t:"Чётко обозначу границу",k:"real",c:"Без лишних эмоций."}
-]
-},
-{
-q:"Что для тебя по-настоящему ценно в таких вечерах?",
-a:[
-{t:"Наблюдать, а не говорить",k:"phil",c:"Ты многое запоминаешь."},
-{t:"Смех без причины",k:"fun",c:"Он самый честный."},
-{t:"Ощущение «мы»",k:"fam",c:"Редкая вещь."},
-{t:"Факт, что всё проходит спокойно",k:"real",c:"Это тоже ценность."}
-]
-},
-// (оставшиеся вопросы логически продолжаются — их 20 в сумме)
+/* =========================
+   ДАННЫЕ ВИКТОРИНЫ
+========================= */
+const questions = [
+  {
+    q: "В какой стране Новый год традиционно встречают в середине лета?",
+    a: ["Австралия", "Аргентина", "ЮАР", "Бразилия"],
+    correct: 0
+  },
+  {
+    q: "Какой предмет чаще всего ассоциируется с новогодним отсчётом времени?",
+    a: ["Свеча", "Колокол", "Часы", "Фейерверк"],
+    correct: 2
+  },
+  {
+    q: "Какой фильм стал неотъемлемой частью новогоднего вечера в странах СНГ?",
+    a: ["Карнавальная ночь", "Ирония судьбы", "Чародеи", "Один дома"],
+    correct: 1
+  },
+  {
+    q: "Какое дерево чаще всего украшают на Новый год?",
+    a: ["Сосна", "Пихта", "Ель", "Кедр"],
+    correct: 2
+  },
+  {
+    q: "В какой стране принято есть 12 виноградин в полночь?",
+    a: ["Италия", "Испания", "Франция", "Португалия"],
+    correct: 1
+  },
+  {
+    q: "Какой цвет символизирует удачу и богатство в новогодних традициях?",
+    a: ["Синий", "Красный", "Золотой", "Белый"],
+    correct: 2
+  },
+  {
+    q: "Что традиционно прячут в праздничный торт в некоторых странах?",
+    a: ["Монету", "Орех", "Фигурку", "Записку"],
+    correct: 0
+  },
+  {
+    q: "Какой праздник исторически предшествовал современному Новому году?",
+    a: ["Сатурналии", "Йоль", "Солнцестояние", "Все перечисленные"],
+    correct: 3
+  },
+  {
+    q: "Какой напиток чаще всего ассоциируется с новогодним тостом?",
+    a: ["Вино", "Шампанское", "Пунш", "Сидр"],
+    correct: 1
+  },
+  {
+    q: "Что символизирует снег в новогодней культуре?",
+    a: ["Обновление", "Тишину", "Чистоту", "Всё перечисленное"],
+    correct: 3
+  }
 ];
 
-let step=0;
-const content=document.getElementById("content");
-const card=document.getElementById("card");
+let current = 0;
+let score = 0;
+const quiz = document.getElementById("quiz");
 
-function render(){
-const q=questions[step];
-content.innerHTML=`
-<div class="question">${q.q}</div>
-<div class="answers">
-${q.a.map((x,i)=>`<button onclick="answer(${i})">${x.t}</button>`).join("")}
-</div>
-<div class="progress">${step+1} / ${questions.length}</div>
-`;
+/* =========================
+   ОТРИСОВКА ВОПРОСА
+========================= */
+function renderQuestion() {
+  const q = questions[current];
+  quiz.innerHTML = `
+    <div class="question">${q.q}</div>
+    <div class="answers">
+      ${q.a.map((text, i) =>
+        `<button class="answer-btn" onclick="selectAnswer(${i})">${text}</button>`
+      ).join("")}
+    </div>
+    <div class="progress">${current + 1} / ${questions.length}</div>
+  `;
 }
 
-function answer(i){
-const a=questions[step].a[i];
-score[a.k]++;
+function selectAnswer(index) {
+  const q = questions[current];
+  const buttons = document.querySelectorAll(".answer-btn");
+  buttons.forEach(btn => btn.disabled = true);
 
-card.classList.add("glow");
-if(a.k==="fun") card.style.animation="shake .4s";
+  let feedback = document.createElement("div");
+  feedback.className = "feedback";
 
-const comment=document.createElement("div");
-comment.className="comment";
-comment.textContent=a.c;
-content.appendChild(comment);
+  if (index === q.correct) {
+    buttons[index].classList.add("correct");
+    feedback.textContent = "Верно! Отличное чувство праздника 🎄";
+    feedback.classList.add("correct");
+    score++;
+  } else {
+    buttons[index].classList.add("wrong");
+    buttons[q.correct].classList.add("correct");
+    feedback.textContent = "Неверно, но праздник продолжается ✨";
+    feedback.classList.add("wrong");
+  }
 
-setTimeout(()=>{
-card.classList.remove("glow");
-card.style.animation="";
-step++;
-if(step<questions.length) render();
-else finish();
-},1300);
+  quiz.appendChild(feedback);
+
+  setTimeout(() => {
+    current++;
+    if (current < questions.length) {
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 1400);
 }
 
-function finish(){
-const top=Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
-let text="";
-if(top==="phil") text="Ты человек наблюдения и смысла. Ты редко говоришь лишнее, но многое видишь. В семье такие люди незаменимы.";
-if(top==="fun") text="Ты тот, кто снимает напряжение. Без тебя вечера были бы тише и суше. Юмор — твой язык близости.";
-if(top==="fam") text="Ты про тепло и присутствие. Рядом с тобой легче быть собой. Это чувствуется.";
-if(top==="real") text="Ты опора реальности. Когда всё идёт спокойно — в этом есть твоя заслуга.";
+/* =========================
+   РЕЗУЛЬТАТ
+========================= */
+function showResult() {
+  const percent = Math.round((score / questions.length) * 100);
+  let message = "Новый год принесёт тебе счастье!";
 
-content.innerHTML=`
-<div class="final">
-<h2>С наступающим Новым годом</h2>
-<p>${text}</p>
-<p>
-Пусть этот год будет честным, спокойным и живым.  
-Пусть рядом будут свои люди — без лишних слов.
-</p>
-<div class="signature">— Эдвард</div>
-</div>
-`;
+  if (percent >= 90) message = "Ты настоящий волшебник зимы!";
+  else if (percent >= 70) message = "Отлично! Год будет удачным!";
+  else if (percent >= 50) message = "Хороший результат — впереди чудеса!";
+
+  quiz.innerHTML = `
+    <div class="result">
+      <h2>Результат</h2>
+      <p>Правильных ответов: <strong>${score}</strong> из ${questions.length}</p>
+      <p>Процент успеха: <strong>${percent}%</strong></p>
+      <p>${message}</p>
+      <button class="restart-btn" onclick="restart()">Пройти снова</button>
+    </div>
+  `;
 }
 
-render();
+function restart() {
+  current = 0;
+  score = 0;
+  renderQuestion();
+}
+
+renderQuestion();
 </script>
 
 </body>
