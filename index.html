@@ -1,489 +1,243 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Викторина для Александры — Сердце в ритме</title>
-  <meta name="theme-color" content="#ff69b4">
-  <style>
-    :root{
-      --bg1:#0f0c29; /* deep space */
-      --bg2:#302b63; /* indigo */
-      --bg3:#24243e; /* violet */
-      --card:#12121bF2;
-      --text:#f8f8ff;
-      --muted:#b6b6c8;
-      --accent:#ff5bbf;
-      --accent-2:#7cf1c8;
-      --good:#7CFC00;
-      --bad:#FF6B6B;
-      --shadow:0 20px 40px rgba(0,0,0,.35);
-      --radius:22px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--text); font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif;
-      background: radial-gradient(1000px 600px at 10% 10%, rgba(255,91,191,.12), transparent 60%),
-                  radial-gradient(800px 500px at 90% 90%, rgba(124,241,200,.10), transparent 60%),
-                  linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
-      display:grid; place-items:center; padding:20px;
-    }
-    .app{width: min(880px, 100%);}
-    header{
-      display:flex; align-items:center; gap:14px; justify-content:space-between; margin-bottom:18px;
-    }
-    .brand{display:flex; align-items:center; gap:12px}
-    .logo{
-      width:54px; height:54px; border-radius:16px; position:relative; overflow:hidden;
-      box-shadow: var(--shadow);
-      background: conic-gradient(from 180deg, #ff5bbf, #a56bff, #5bf7e8, #ff5bbf);
-      display:grid; place-items:center;
-    }
-    .logo svg{filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
-    h1{font-size: clamp(22px, 4vw, 32px); margin:0; letter-spacing:.2px}
-    .badge{
-      font-size:12px; color:var(--text); opacity:.85; padding:6px 10px; border:1px solid rgba(255,255,255,.14);
-      border-radius:999px; backdrop-filter: blur(6px); background:rgba(255,255,255,.05)
-    }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .hero{padding:18px 18px 0}
-    .progress{height:10px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden}
-    .bar{height:100%; width:0%; background: linear-gradient(90deg, var(--accent), #a56bff); transition: width .35s ease}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Новогодняя викторина</title>
 
-    .content{padding:22px}
-    .q-title{font-size: clamp(18px, 3.2vw, 24px); margin:0 0 14px; line-height:1.25}
-    .options{display:grid; gap:12px}
-    .btn{
-      width:100%; text-align:left; padding:14px 16px; border-radius:16px; border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.03); color:var(--text); font-size:16px; cursor:pointer; transition:.15s transform ease, .25s background ease;
+<style>
+:root {
+    --bg: #0b0f1a;
+    --card: #141a2e;
+    --accent: #d4af37;
+    --text: #eaeaf0;
+    --soft: #9aa4c7;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #1b2350, var(--bg));
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    overflow: hidden;
+}
+
+/* СНЕГ */
+.snow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.snow span {
+    position: absolute;
+    top: -10px;
+    width: 6px;
+    height: 6px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    0% { transform: translateY(0); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(110vh); opacity: 0.2; }
+}
+
+/* КАРТОЧКА */
+.card {
+    position: relative;
+    z-index: 2;
+    max-width: 520px;
+    width: 100%;
+    background: linear-gradient(180deg, #1a2040, var(--card));
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    animation: fadeIn 1s ease;
+}
+
+h1 {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--soft);
+    margin-bottom: 26px;
+    font-size: 15px;
+}
+
+.question {
+    font-size: 18px;
+    margin-bottom: 18px;
+}
+
+.answers button {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #2a335f;
+    background: #1c2348;
+    color: var(--text);
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.answers button:active {
+    transform: scale(0.98);
+}
+
+.answers button:hover {
+    background: #252e66;
+}
+
+.progress {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--soft);
+    text-align: right;
+}
+
+.final {
+    text-align: center;
+    line-height: 1.6;
+    animation: fadeIn 1.2s ease;
+}
+
+.final h2 {
+    color: var(--accent);
+    margin-bottom: 20px;
+}
+
+.signature {
+    margin-top: 28px;
+    font-style: italic;
+    color: var(--soft);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* МОБИЛЬНАЯ АДАПТАЦИЯ */
+@media (max-width: 480px) {
+    .card {
+        padding: 22px;
     }
-    .btn:hover{transform: translateY(-1px); background:rgba(255,255,255,.06)}
-    .btn[disabled]{opacity:.6; cursor:not-allowed}
-    .btn.correct{border-color: rgba(124,252,0,.8); background: rgba(124,252,0,.12)}
-    .btn.wrong{border-color: rgba(255,107,107,.7); background: rgba(255,107,107,.10)}
-
-    .meta{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:16px; color:var(--muted); font-size:14px}
-
-    .footer{
-      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:18px; border-top:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.12));
+    .question {
+        font-size: 17px;
     }
-    .cta{
-      display:flex; gap:10px; flex-wrap:wrap;
-    }
-    .ghost, .solid{
-      border-radius:14px; padding:10px 14px; font-weight:600; border:1px solid rgba(255,255,255,.18); cursor:pointer;
-      background:rgba(255,255,255,.04); color:var(--text);
-    }
-    .solid{ background: linear-gradient(90deg, var(--accent), #a56bff); border:none }
-
-    .hidden{display:none}
-
-    .result{
-      text-align:center; padding:26px; display:grid; gap:14px;
-      background: radial-gradient(600px 200px at 50% 0%, rgba(255,91,191,.14), transparent 60%);
-    }
-    .result h2{font-size: clamp(20px, 4vw, 28px); margin:0}
-    .result p{margin:0; color:var(--muted)}
-
-    .tag{display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); margin-right:6px}
-
-    /* Confetti canvas sits on top */
-    #confetti{position:fixed; inset:0; pointer-events:none}
-
-    /* Respect reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      .btn:hover{transform:none}
-      .bar{transition:none}
-    }
-  </style>
+}
+</style>
 </head>
+
 <body>
-  <canvas id="confetti"></canvas>
-  <div class="app" role="application" aria-label="Викторина для Александры">
-    <header>
-      <div class="brand">
-        <div class="logo" aria-hidden="true">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 21s-6-3.5-6-9a6 6 0 1 1 12 0c0 5.5-6 9-6 9Z" stroke="white" stroke-width="1.2"/>
-            <circle cx="12" cy="9" r="2.6" fill="white"/>
-          </svg>
+
+<div class="snow" id="snow"></div>
+
+<div class="card">
+    <h1>Небольшая викторина</h1>
+    <div class="subtitle">Несколько вопросов — и тёплое завершение</div>
+    <div id="content"></div>
+</div>
+
+<script>
+/* СНЕГ */
+const snowContainer = document.getElementById("snow");
+const snowCount = 40;
+
+for (let i = 0; i < snowCount; i++) {
+    const flake = document.createElement("span");
+    flake.style.left = Math.random() * 100 + "vw";
+    flake.style.animationDuration = 5 + Math.random() * 7 + "s";
+    flake.style.opacity = Math.random();
+    flake.style.transform = `scale(${0.5 + Math.random()})`;
+    snowContainer.appendChild(flake);
+}
+
+/* ВИКТОРИНА */
+const questions = [
+    {
+        q: "Что для тебя важнее в новом году?",
+        a: ["Внутреннее спокойствие", "Рост и движение", "Люди рядом"]
+    },
+    {
+        q: "Какое состояние хочется чувствовать чаще?",
+        a: ["Уверенность", "Интерес к жизни", "Тихую радость"]
+    },
+    {
+        q: "Что для тебя действительно ценно?",
+        a: ["Честность", "Смысл", "Настоящие моменты"]
+    }
+];
+
+let step = 0;
+const content = document.getElementById("content");
+
+function renderQuestion() {
+    const q = questions[step];
+    content.innerHTML = `
+        <div class="question">${q.q}</div>
+        <div class="answers">
+            ${q.a.map(ans => `<button onclick="next()">${ans}</button>`).join("")}
         </div>
-        <div>
-          <h1>«Сердце в ритме» — квиз для Александры</h1>
-          <div class="badge">Позитив • Мотивация • Любовь к музыке</div>
+        <div class="progress">${step + 1} / ${questions.length}</div>
+    `;
+}
+
+function next() {
+    step++;
+    if (step < questions.length) {
+        renderQuestion();
+    } else {
+        renderFinal();
+    }
+}
+
+function renderFinal() {
+    content.innerHTML = `
+        <div class="final">
+            <h2>С наступающим Новым годом</h2>
+            <p>
+                Пусть следующий год будет спокойнее внутри  
+                и точнее в решениях.
+            </p>
+            <p>
+                Пусть будет меньше шума  
+                и больше настоящих моментов.
+            </p>
+            <p>
+                Желаю сил без надрыва,  
+                движения без спешки  
+                и радости, которая остаётся.
+            </p>
+            <div class="signature">— Эдвард</div>
         </div>
-      </div>
-      <span class="badge" id="attempts">Попытка №1</span>
-    </header>
+    `;
+}
 
-    <div class="card" id="screen-quiz" aria-live="polite">
-      <div class="hero">
-        <div class="progress" aria-hidden="true">
-          <div class="bar" id="bar" style="width:0%"></div>
-        </div>
-      </div>
-      <div class="content">
-        <h2 class="q-title" id="q-title">Загрузка вопроса…</h2>
-        <div class="options" id="options" role="group" aria-labelledby="q-title"></div>
-        <div class="meta"><span id="explain">Подсказка появится после ответа</span><span id="counter">0 / 0</span></div>
-      </div>
-      <div class="footer">
-        <div class="cta">
-          <button class="ghost" id="skip">Пропустить</button>
-          <button class="ghost" id="hint">Подсказка</button>
-        </div>
-        <button class="solid" id="next" disabled>Дальше</button>
-      </div>
-    </div>
+renderQuestion();
+</script>
 
-    <div class="card hidden" id="screen-result">
-      <div class="result">
-        <div style="font-size:40px">💖✨</div>
-        <h2 id="result-title">Супер!</h2>
-        <p id="result-sub">Ты сияешь как неон над ночным городом.</p>
-        <div>
-          <span class="tag" id="tag-accuracy">Точность: 0%</span>
-          <span class="tag" id="tag-streak">Сердечная серия: 0</span>
-          <span class="tag" id="tag-time">Время: 0с</span>
-        </div>
-      </div>
-      <div class="footer">
-        <div class="cta">
-          <button class="solid" id="share">Поделиться</button>
-          <button class="ghost" id="copy">Скопировать результат</button>
-        </div>
-        <button class="ghost" id="again">Пройти ещё раз</button>
-      </div>
-    </div>
-
-    <p style="text-align:center; opacity:.8; font-size:12px; margin:14px 6px 0">
-      Сделано с теплом для Александры. Пусть каждый стрим зажигает сердца.
-    </p>
-  </div>
-
-  <script>
-    // ------------------------------
-    // ДАННЫЕ ВОПРОСОВ
-    // ------------------------------
-    const QUESTIONS = [
-      {
-        q: "Как звучит девиз этой викторины?",
-        a: [
-          "Больше света, больше сердца",
-          "Стримим, как придется",
-          "Только факты, никакой любви"
-        ],
-        correct: 0,
-        why: "Да, мы тут за тепло и вдохновение."
-      },
-      {
-        q: "Что лучше всего поднимает настроение зрителю на стриме Александры?",
-        a: [
-          "Искренность и улыбка",
-          "Токсичный сарказм",
-          "Скучная тишина"
-        ],
-        correct: 0,
-        why: "Искренность всегда в тренде, а улыбка — универсальный буст."
-      },
-      {
-        q: "Какой плейлист включает Александра, когда хочется романтики?",
-        a: [
-          "Про любовь",
-          "Про будильники",
-          "Про шум стиральной машины"
-        ],
-        correct: 0,
-        why: "Музыка про любовь — её стихия."
-      },
-      {
-        q: "Как поступить с ошибкой во время прямого эфира?",
-        a: [
-          "Сделать паузу, улыбнуться и идти дальше",
-          "Выключить всё и уйти в лес",
-          "Спорить с чатом целый час"
-        ],
-        correct: 0,
-        why: "Осечка — не финал, а момент для человеческого шарма."
-      },
-      {
-        q: "Что важнее всего в общении с аудиторией?",
-        a: [
-          "Доброе сердце и уважение",
-          "Строгие правила без эмоций",
-          "Игнор зрителей"
-        ],
-        correct: 0,
-        why: "Сердечность никогда не выходит из моды."
-      },
-      {
-        q: "Как назвать стиль Александры?",
-        a: [
-          "Яркая личность с большим сердцем",
-          "Туманное настроение",
-          "Случайный набор событий"
-        ],
-        correct: 0,
-        why: "Мы же так и договорились: ярко и по-настоящему."
-      },
-      {
-        q: "Что делать, если день выдался тяжёлым?",
-        a: [
-          "Ненадолго выдохнуть и включить любимую песню",
-          "Сдаться в первой же минуте",
-          "Сравнить себя с идеалом из сети"
-        ],
-        correct: 0,
-        why: "Короткий перерыв + музыка творят чудеса."
-      },
-      {
-        q: "Какой самый сильный инструмент ведущей?",
-        a: [
-          "Искренность и контакт с людьми",
-          "Секретная кнопка ‘суперлайк’",
-          "Невидимый сценарий"
-        ],
-        correct: 0,
-        why: "Живое общение сильнее любых эффектов."
-      },
-      {
-        q: "Как относиться к критике?",
-        a: [
-          "Взять полезное и двигаться дальше",
-          "Навсегда прекращать стримы",
-          "Устроить битву на 3 часа"
-        ],
-        correct: 0,
-        why: "Фильтруем, берём по делу и вперёд."
-      },
-      {
-        q: "Финальный аккорд: на что всегда можно опереться?",
-        a: [
-          "На своё доброе сердце и поддержку людей",
-          "На случай",
-          "На прогноз по лайкам"
-        ],
-        correct: 0,
-        why: "Сердце + люди = сила, которая держит эфир."
-      }
-    ];
-
-    // Перемешать вопросы и варианты
-    function shuffle(arr){
-      for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}
-      return arr
-    }
-
-    // Состояние
-    const state = {
-      idx: 0,
-      order: shuffle([...Array(QUESTIONS.length).keys()]),
-      answered: false,
-      score: 0,
-      streak: 0,
-      start: performance.now(),
-      attempts: Number(localStorage.getItem('alex_quiz_attempts')||'0')
-    };
-    state.attempts += 1; localStorage.setItem('alex_quiz_attempts', String(state.attempts));
-
-    // Узлы
-    const qTitle = document.getElementById('q-title');
-    const options = document.getElementById('options');
-    const bar = document.getElementById('bar');
-    const counter = document.getElementById('counter');
-    const explain = document.getElementById('explain');
-    const nextBtn = document.getElementById('next');
-    const skipBtn = document.getElementById('skip');
-    const hintBtn = document.getElementById('hint');
-    const attemptsEl = document.getElementById('attempts');
-
-    const screenQuiz = document.getElementById('screen-quiz');
-    const screenResult = document.getElementById('screen-result');
-
-    const resultTitle = document.getElementById('result-title');
-    const resultSub = document.getElementById('result-sub');
-    const tagAcc = document.getElementById('tag-accuracy');
-    const tagStreak = document.getElementById('tag-streak');
-    const tagTime = document.getElementById('tag-time');
-    const shareBtn = document.getElementById('share');
-    const copyBtn = document.getElementById('copy');
-    const againBtn = document.getElementById('again');
-
-    attemptsEl.textContent = `Попытка №${state.attempts}`;
-
-    function render(){
-      const total = state.order.length;
-      const i = state.order[state.idx];
-      const item = QUESTIONS[i];
-      qTitle.textContent = item.q;
-      options.innerHTML = '';
-      const optOrder = shuffle(item.a.map((_,idx)=>idx));
-      optOrder.forEach(idx=>{
-        const btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.textContent = item.a[idx];
-        btn.setAttribute('data-idx', idx);
-        btn.addEventListener('click',()=>select(idx, item.correct));
-        options.appendChild(btn);
-      });
-      state.answered = false;
-      nextBtn.disabled = true;
-      bar.style.width = `${(state.idx/total)*100}%`;
-      counter.textContent = `${state.idx+1} / ${total}`;
-      explain.textContent = 'Подсказка появится после ответа';
-    }
-
-    function select(idx, correct){
-      if(state.answered) return;
-      state.answered = true;
-      const btns = [...options.querySelectorAll('.btn')];
-      btns.forEach(b=>b.disabled = true);
-
-      const chosen = btns.find(b => Number(b.getAttribute('data-idx'))===idx);
-      const right = btns.find(b => Number(b.getAttribute('data-idx'))===correct);
-
-      if(idx===correct){
-        state.score += 1; state.streak += 1;
-        chosen.classList.add('correct');
-        popConfetti(120);
-        explain.textContent = QUESTIONS[state.order[state.idx]].why + `  Серия: ${state.streak}.`;
-      } else {
-        state.streak = 0;
-        chosen.classList.add('wrong');
-        right.classList.add('correct');
-        explain.textContent = 'Не страшно. Главное — идти дальше. ' + QUESTIONS[state.order[state.idx]].why;
-      }
-      nextBtn.disabled = false;
-    }
-
-    nextBtn.addEventListener('click', ()=>{
-      const total = state.order.length;
-      if(state.idx < total-1){
-        state.idx++; render();
-      } else {
-        showResult();
-      }
-    });
-
-    skipBtn.addEventListener('click', ()=>{
-      if(state.answered) return;
-      state.streak = 0; // сбрасываем серию при пропуске
-      nextBtn.click();
-    });
-
-    hintBtn.addEventListener('click', ()=>{
-      const i = state.order[state.idx];
-      const tip = QUESTIONS[i].why || 'Доверяй сердцу.';
-      explain.textContent = 'Подсказка: ' + tip;
-    });
-
-    function showResult(){
-      const total = state.order.length;
-      const accuracy = Math.round((state.score/total)*100);
-      const seconds = Math.max(1, Math.round((performance.now()-state.start)/1000));
-
-      // сообщенки
-      let title = 'Ты огонь, Саша!';
-      let sub = 'Этот квиз только подтвердил очевидное: сердце у тебя на максимум.';
-      if(accuracy===100){
-        title = 'Идеально! 💯';
-        sub = 'Музыка любви, уверенность и доброта — безупречное комбо.';
-      } else if(accuracy>=70){
-        title = 'Сильный результат!';
-        sub = 'Ещё немного — и будет чистая магия.';
-      } else if(accuracy>=40){
-        title = 'Хорошее начало!';
-        sub = 'Главное — ритм и улыбка. Остальное подтянется.';
-      } else {
-        title = 'Первый шаг — уже победа';
-        sub = 'Расти — это стиль. На повторе будет лучше.';
-      }
-
-      resultTitle.textContent = title;
-      resultSub.textContent = sub;
-      tagAcc.textContent = `Точность: ${accuracy}%`;
-      tagStreak.textContent = `Сердечная серия: ${state.streak}`;
-      tagTime.textContent = `Время: ${seconds}с`;
-
-      screenQuiz.classList.add('hidden');
-      screenResult.classList.remove('hidden');
-      popConfetti(250);
-    }
-
-    againBtn.addEventListener('click', ()=>{
-      // перезапуск
-      state.idx = 0; state.score = 0; state.streak = 0; state.start = performance.now();
-      state.order = shuffle([...Array(QUESTIONS.length).keys()]);
-      screenResult.classList.add('hidden');
-      screenQuiz.classList.remove('hidden');
-      render();
-    });
-
-    // Шаринг
-    function buildShareText(){
-      const total = state.order.length;
-      const accuracy = Math.round((state.score/total)*100);
-      return `Я прошла(ел) квиз \"Сердце в ритме\" для Александры: ${accuracy}% ❤️✨`;
-    }
-
-    shareBtn.addEventListener('click', async ()=>{
-      const text = buildShareText();
-      if(navigator.share){
-        try{ await navigator.share({title:'Сердце в ритме', text}); }catch(e){}
-      } else {
-        await navigator.clipboard.writeText(text);
-        copyBtn.textContent = 'Скопировано!';
-        setTimeout(()=>copyBtn.textContent='Скопировать результат', 1500);
-      }
-    });
-
-    copyBtn.addEventListener('click', async ()=>{
-      try{ await navigator.clipboard.writeText(buildShareText()); copyBtn.textContent='Скопировано!'; setTimeout(()=>copyBtn.textContent='Скопировать результат', 1500);}catch(e){}
-    });
-
-    // Простая конфетти
-    const confettiCanvas = document.getElementById('confetti');
-    const ctx = confettiCanvas.getContext('2d');
-    let confetti = [];
-    function resize(){ confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight }
-    window.addEventListener('resize', resize); resize();
-
-    function popConfetti(count=120){
-      const colors = ['#ff5bbf','#a56bff','#7cf1c8','#ffffff'];
-      for(let i=0;i<count;i++){
-        confetti.push({
-          x: Math.random()*confettiCanvas.width,
-          y: -10,
-          r: 2 + Math.random()*4,
-          c: colors[Math.floor(Math.random()*colors.length)],
-          v: 1 + Math.random()*3,
-          a: Math.random()*Math.PI
-        })
-      }
-    }
-
-    function tick(){
-      ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-      confetti.forEach(p=>{
-        p.y += p.v; p.x += Math.sin(p.a)*0.8; p.a += 0.02;
-        ctx.fillStyle = p.c;
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-      });
-      confetti = confetti.filter(p=>p.y < confettiCanvas.height+10);
-      requestAnimationFrame(tick);
-    }
-    tick();
-
-    // Запуск
-    render();
-  </script>
 </body>
 </html>
